@@ -1,4 +1,4 @@
-name: Tag on Merge To Master
+name: Release on Merge To Master
 on:
   push:
     branches:
