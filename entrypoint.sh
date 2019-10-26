@@ -53,20 +53,21 @@ function generate_new_release_data {
     fi
 
     LAST_TAG_NAME=$(jq ".tag_name" last_release -r || echo "0.0.0")
-    NEXT_TAG_NAME=$("${CURRENT_DIR}/lib/semver" bump "$BUMP_VERSION_SCHEME" "$LAST_TAG_NAME")
+    LAST_VERSION=${LAST_TAG_NAME#v}
+    NEXT_VERSION=$("${CURRENT_DIR}/lib/semver" "$BUMP_VERSION_SCHEME" "$LAST_VERSION")
 
     cat << EOF > new_release_data
 {
-  "tag_name": "v${NEXT_TAG_NAME}",
+  "tag_name": "v${NEXT_VERSION}",
   "target_commitish": "${GITHUB_SHA}",
-  "name": "${NEXT_TAG_NAME}",
-  "body": "Version ${NEXT_TAG_NAME}",
+  "name": "${NEXT_VERSION}",
+  "body": "Version ${NEXT_VERSION}",
   "draft": false,
   "prerelease": false
 }
 EOF
 
-    echo "Next release set to be: ${NEXT_TAG_NAME}"
+    echo "Next version set to be: ${NEXT_VERSION}"
 }
 
 

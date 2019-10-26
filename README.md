@@ -67,6 +67,6 @@ track what the last release version is. See [Release#get-the-latest-release](htt
 
 ## Big Thanks To
 
-- semver-tool: https://github.com/fsaintjacques/semver-tool
+- shell-semver: https://github.com/fmahnke/shell-semver
 - https://github.com/mikeal/publish-to-github-action/
 - Inspiration: https://github.com/roomkey/lein-v
