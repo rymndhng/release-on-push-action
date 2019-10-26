@@ -1,12 +1,19 @@
-# tag-on-push-action
+# Github Release On Push Action
 
-Github Action to create a tag on push.
+Github Action to create a release on push.
 
 ## Rationale
 
-CI & CD should work from stable identifiers. Commit SHAs are ok, but humans work
-better with identifiers whose before/after relationship can be reasoned with.
+CI & CD systems are simpler when they work with immutable monotonic identifers
+from the get-go. Trigger your release activites by subscribing to new tags
+pushed from this Action.
 
+For automation, Github Releases (and by extension git tags) are better than
+versioned commit files for these reasons:
+
+- Agnostic of language & ecosystem (i.e. does not rely on presence of package.json)
+- Tagging does not require write permissions to bump version
+- Tagging does not trigger infinite-loop webhooks from pushing version bump commits
 
 ## Example Workflow
 
@@ -17,15 +24,14 @@ on:
       - master
 
 jobs:
-  tag-on-push:
+  release-on-push:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: rymndhng/tag-on-push@master
+      - uses: rymndhng/release-on-push-action@master
         with:
           strategy: minor
-
 ```
 
 
@@ -52,8 +58,16 @@ Yes, if the PR has the label `release:major`, `release:minor`, or `release:patch
 
 No, you do not! Github Actions will inject a token for this plugin to interact with the API. 
 
-## Big Thanks
+### Can I create a tag instead of a release?
 
-- semver: https://github.com/fsaintjacques/semver-tool
-- lein-v:
-- learning from: https://github.com/mikeal/publish-to-github-action/
+There's no current plans to support this. 
+
+In order to reliably generate monotonic versions, we need to have a guaranteed
+ordering of tags. Github Releases maintains a ordering of releases which this
+action can rely on.
+
+## Big Thanks To
+
+- semver-tool: https://github.com/fsaintjacques/semver-tool
+- https://github.com/mikeal/publish-to-github-action/
+- Inspiration: https://github.com/roomkey/lein-v
