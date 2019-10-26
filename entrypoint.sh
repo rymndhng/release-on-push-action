@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 CURRENT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
@@ -34,13 +34,17 @@ function fetch_related_files {
          > last_release
 }
 
+function pr_has_label {
+    jq --arg labelname "$1" '.items[0].labels | map_values(.name) | contains([$labelname])' -r related_prs
+}
+
 function generate_new_release_data {
     BUMP_VERSION_SCHEME="$INPUT_BUMP_VERSION_SCHEME"
-    if [[ "true" == $(jq '.items[0].labels | type=="array" and contains(["release:patch"])' -r related_prs) ]]; then
+    if [[ "true" == $(pr_has_label "release:patch") ]]; then
         BUMP_VERSION_SCHEME="patch"
-    elif [[ "true" == $(jq '.items[0].labels | type=="array" and contains(["release:minor"])' -r related_prs) ]]; then
+    elif [[ "true" == $(pr_has_label "release:minor") ]]; then
         BUMP_VERSION_SCHEME="minor"
-    elif [[ "true" == $(jq '.items[0].labels | type=="array" and contains(["release:major"])' -r related_prs) ]]; then
+    elif [[ "true" == $(pr_has_label "release:major") ]]; then
         BUMP_VERSION_SCHEME="major"
     fi
 
@@ -70,9 +74,8 @@ function skip_if_norelease_set {
         exit
     fi
 
-    PR_LABELS=$(jq '.items[0].labels | join(",")' -r related_prs)
     PR_URL=$(jq '.items[0].url' -r related_prs)
-    if [[ $PR_LABELS == *'norelease'* ]]; then
+    if [[ "true" == $(pr_has_label "norelease") ]]; then
         echo "Skipping release. Reason: related PR has label norelease. PR: ${PR_URL}"
         exit
     fi
