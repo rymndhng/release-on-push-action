@@ -5,8 +5,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: zbeekman/ShellCheck-Linter-Action@v1.0.1
-        name: shell linter
-      - uses: rymndhng/tag-on-push-action@v1
+      - uses: rymndhng/tag-on-push-action@master
         env:
           DRYRUN: 1
