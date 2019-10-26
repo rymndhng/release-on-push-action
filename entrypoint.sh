@@ -24,9 +24,9 @@ function skip_if_norelease_set {
          --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}" \
          > last_commit
 
-    COMMIT_TITLE=$(jq .message last_commit | head -n 1)
+    COMMIT_TITLE=$(jq '.commit.message' last_commit -r | head -n 1)
 
-    if [[ $COMMIT_TITLE == '*[norelease]*' ]]; then
+    if [[ $COMMIT_TITLE == *'[norelease]'* ]]; then
         echo 'Skipping release. Reason: git commit title contains [norelease]'
         exit
     fi
