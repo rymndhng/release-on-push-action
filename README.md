@@ -1,19 +1,11 @@
 # tag-on-push-action
-Github Action to Tag a Repository on Push
+
+Github Action to create a tag on push.
 
 ## Rationale
 
-Creates git tags based on pushes to a matching master branch in a tooling agnostic way.
-
-Pains this solves:
-
-1. Developers don't need to run another script manually to create a tag
-2. Enforces consistent tagging policy
-3. Language/Ecosystem agnostic.
-
-## Inspiration
-
-- `lein-v`
+CI & CD should work from stable identifiers. Commit SHAs are ok, but humans work
+better with identifiers whose before/after relationship can be reasoned with.
 
 
 ## Example Workflow
@@ -36,12 +28,18 @@ jobs:
 
 ```
 
+
 Supported strategies
 
 - minor-version
 - major-version
 - calver
 
+## FAQ
+
+### How do I skip creation of a release?
+
+Put `[norelease]` in the title.
 
 ## Big Thanks
 
