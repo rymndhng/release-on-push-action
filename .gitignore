@@ -1,1 +1,6 @@
 .env
+
+# Ignore state used for local testing
+last_commit
+last_release
+new_release_data
