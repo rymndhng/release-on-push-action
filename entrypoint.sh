@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 if [ -z "${GITHUB_TOKEN}" ]; then
     echo "error: not found GITHUB_TOKEN"
