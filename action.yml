@@ -1,16 +1,15 @@
 # action.yml
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'Tag/Release on Push Action'
+description: 'Creates a Tag/Release on pushes to a branch'
+author: 'rymndhng'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  version-csheme:  # id of input
+    description: 'The versioning scheme to use for tags. One of semver-minor, semver-major, semver-patch, calver'
     required: true
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+    default: 'semver-minor'
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - ${{ inputs.who-to-greet }}
+branding:
+  icon: 'award'
+  color: 'blue'
