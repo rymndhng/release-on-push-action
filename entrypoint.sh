@@ -20,7 +20,7 @@ if [ -z "${GITHUB_SHA}" ]; then
 fi
 
 function skip_if_norelease_set {
-    curl --header "Authorization: token ${GITHUB_TOKEN}" \
+    curl --silent --header "Authorization: token ${GITHUB_TOKEN}" \
          --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}" \
          > last_commit
 
@@ -34,7 +34,7 @@ function skip_if_norelease_set {
 
 function generate_new_release_data {
     # Get the last release tag
-    curl --header "Authorization: token ${GITHUB_TOKEN}" \
+    curl --silent --header "Authorization: token ${GITHUB_TOKEN}" \
          --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest" \
          > last_release
 
@@ -55,7 +55,7 @@ EOF
 
 function create_new_release {
     if [ -z "$DRYRUN" ]; then
-        curl --header "Authorization: token ${GITHUB_TOKEN}" \
+        curl --silent --header "Authorization: token ${GITHUB_TOKEN}" \
              --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" \
              --request POST \
              --data @new_release_data
