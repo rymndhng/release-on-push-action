@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-#!/bin/bash
-=======
 #!/bin/bash -e
 
->>>>>>> It works!
 if [ -z "${GITHUB_TOKEN}" ]; then
     echo "error: not found GITHUB_TOKEN"
     exit 1
