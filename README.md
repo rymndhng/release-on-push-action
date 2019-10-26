@@ -60,11 +60,10 @@ No, you do not! Github Actions will inject a token for this plugin to interact w
 
 ### Can I create a tag instead of a release?
 
-There's no current plans to support this. 
+Currently, no.
 
-In order to reliably generate monotonic versions, we need to have a guaranteed
-ordering of tags. Github Releases maintains a ordering of releases which this
-action can rely on.
+In order to reliably generate monotonic versions, we use Github Releases to
+track what the last release version is. See [Release#get-the-latest-release](https://developer.github.com/v3/repos/releases/#get-the-latest-release).
 
 ## Big Thanks To
 
