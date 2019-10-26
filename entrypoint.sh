@@ -57,10 +57,10 @@ function generate_new_release_data {
 
     cat << EOF > new_release_data
 {
-  "tag_name": "${NEXT_TAG_NAME}",
+  "tag_name": "v${NEXT_TAG_NAME}",
   "target_commitish": "${GITHUB_SHA}",
   "name": "${NEXT_TAG_NAME}",
-  "body": "Release ${NEXT_TAG_NAME}",
+  "body": "Version ${NEXT_TAG_NAME}",
   "draft": false,
   "prerelease": false
 }
