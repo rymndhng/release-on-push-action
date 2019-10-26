@@ -9,3 +9,4 @@ jobs:
         env:
           DRYRUN: 1
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEBUG: true
