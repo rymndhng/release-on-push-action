@@ -1,5 +1,7 @@
 #!/bin/bash -ex
 
+CURRENT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 if [ -z "${GITHUB_TOKEN}" ]; then
     echo "error: not found GITHUB_TOKEN"
     exit 1
@@ -37,7 +39,7 @@ function generate_new_release_data {
          > last_release
 
     LAST_TAG_NAME=$(jq ".tag_name" last_release -r || echo "0.0.0")
-    NEXT_TAG_NAME=$(./lib/semver bump minor "$LAST_TAG_NAME")
+    NEXT_TAG_NAME=$("${CURRENT_DIR}/lib/semver" bump minor "$LAST_TAG_NAME")
 
     cat << EOF > new_release_data
 {
