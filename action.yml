@@ -3,10 +3,10 @@ name: 'Tag/Release on Push Action'
 description: 'Creates a Tag/Release on pushes to a branch'
 author: 'rymndhng'
 inputs:
-  version-csheme:  # id of input
-    description: 'The versioning scheme to use for tags. One of semver-minor, semver-major, semver-patch, calver'
+  bump_version_scheme:
+    description: 'The versioning scheme to use for tags. One of: minor, major, patch'
     required: true
-    default: 'semver-minor'
+    default: 'minor'
 runs:
   using: 'docker'
   image: 'Dockerfile'
