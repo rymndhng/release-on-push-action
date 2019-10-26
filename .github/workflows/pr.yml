@@ -1,0 +1,12 @@
+name: Tests
+on: [ push ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: zbeekman/ShellCheck-Linter-Action@v1.0.1
+        name: shell linter
+      - uses: rymndhng/tag-on-push-action@v1
+        env:
+          DRYRUN: 1

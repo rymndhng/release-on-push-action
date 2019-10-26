@@ -1,0 +1,10 @@
+name: Tag on Merge To Master
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rymndhng/tag-on-push-action@v1
