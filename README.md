@@ -1,6 +1,8 @@
 # Github Release On Push Action
 
-Github Action to create a release on push.
+> Stop using files for versioning. Use git tags instead!
+
+Github Action to create a release on push. 
 
 ## Rationale
 
