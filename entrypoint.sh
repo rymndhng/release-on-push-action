@@ -43,7 +43,7 @@ function pr_has_label {
 }
 
 function generate_new_release_data {
-    BUMP_VERSION_SCHEME="$INPUT_BUMP_VERSION_SCHEME"
+    BUMP_VERSION_SCHEME="$INPUT_STRATEGY"
     if [[ "true" == $(pr_has_label "release:patch") ]]; then
         BUMP_VERSION_SCHEME="patch"
     elif [[ "true" == $(pr_has_label "release:minor") ]]; then
