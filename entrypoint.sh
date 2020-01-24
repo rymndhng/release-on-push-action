@@ -39,7 +39,7 @@ function fetch_related_files {
 }
 
 function pr_has_label {
-    jq --arg labelname "$1" '.items[0].labels | map_values(.name) | contains([$labelname])' -r related_prs
+    jq --arg labelname "$1" '.items[0].labels | map_values(.name) | contains([$labelname])' -r related_prs || echo "false"
 }
 
 function generate_new_release_data {
@@ -79,7 +79,7 @@ function skip_if_norelease_set {
         exit
     fi
 
-    PR_URL=$(jq '.items[0].url' -r related_prs)
+    PR_URL=$(jq '.items[0].url' -r related_prs || echo "false")
     if [[ "true" == $(pr_has_label "norelease") ]]; then
         echo "Skipping release. Reason: related PR has label norelease. PR: ${PR_URL}"
         exit
