@@ -5,11 +5,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: Setting up BATS
         run: sudo npm install -g bats
 
       - name: Unit Tests
-        run: bats test
+        run: make test
 
       - name: Integration Tests
         uses: rymndhng/release-on-push-action@master
