@@ -67,6 +67,15 @@ Currently, no.
 In order to reliably generate monotonic versions, we use Github Releases to
 track what the last release version is. See [Release#get-the-latest-release](https://developer.github.com/v3/repos/releases/#get-the-latest-release).
 
+## Development
+
+Relies on [bats](https://github.com/bats-core/bats-core).
+
+``` sh
+make test
+```
+
+
 ## Big Thanks To
 
 - shell-semver: https://github.com/fmahnke/shell-semver
