@@ -23,6 +23,13 @@ function check_preconditions {
         echo "error: not found GITHUB_SHA"
         exit 1
     fi
+
+    # ensure BUMP_VERSION_SCHEME is set
+    ALLOWED_BUMP_VERSION_SCHEMES="norelease major minor patch"
+    if ! echo "$ALLOWED_BUMP_VERSION_SCHEMES" | xargs -n1 | grep "$INPUT_BUMP_VERSION_SCHEME"; then
+        echo "error: unexpected INPUT_BUMP_VERSION_SCHEME"
+        exit 1
+    fi
 }
 
 function fetch_related_files {
@@ -49,7 +56,7 @@ function pr_has_label {
 }
 
 function generate_new_release_data {
-    BUMP_VERSION_SCHEME="$INPUT_STRATEGY"
+    BUMP_VERSION_SCHEME="$INPUT_BUMP_VERSION_SCHEME"
     if [[ "true" == $(cat related_prs | pr_has_label "release:patch") ]]; then
         BUMP_VERSION_SCHEME="patch"
     elif [[ "true" == $(cat related_prs | pr_has_label "release:minor") ]]; then
@@ -58,7 +65,12 @@ function generate_new_release_data {
         BUMP_VERSION_SCHEME="major"
     fi
 
-    LAST_TAG_NAME=$(jq ".tag_name" last_release -r || echo "0.0.0")
+    if [[ "norelease" == "$BUMP_VERSION_SCHEME" ]]; then
+        echo "Skipping release, no version is bumped."
+        exit 1;
+    fi
+
+    LAST_TAG_NAME=$(jq '.tag_name // "0.0.0"' last_release -r || echo "0.0.0")
     LAST_VERSION=${LAST_TAG_NAME#v}
     NEXT_VERSION=$("${CURRENT_DIR}/lib/semver" "$BUMP_VERSION_SCHEME" "$LAST_VERSION")
 
@@ -85,9 +97,9 @@ function skip_if_norelease_set {
         exit
     fi
 
-    PR_URL=$(jq '.items[0].url' -r related_prs || echo "false")
-    if [[ "true" == $(pr_has_label "norelease") ]]; then
-        echo "Skipping release. Reason: related PR has label norelease. PR: ${PR_URL}"
+    PR_URL=$(jq '.items | map(.url) | flatten' -r related_prs || echo "false")
+    if [[ "true" == $(cat related_prs | pr_has_label "norelease") ]]; then
+        echo "Skipping release. Reason: related PR has label norelease. PR URLs: ${PR_URL}"
         exit
     fi
 }

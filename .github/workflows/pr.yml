@@ -17,7 +17,7 @@ jobs:
       - name: Integration Tests
         run: ./entrypoint.sh
         env:
-          INPUT_STRATEGY: minor
+          INPUT_BUMP_VERSION_SCHEME: minor
           DRYRUN: 1
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEBUG: true

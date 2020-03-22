@@ -33,28 +33,32 @@ jobs:
     steps:
       - uses: rymndhng/release-on-push-action@master
         with:
-          strategy: minor
+          bump_version_scheme: minor
 ```
 
 
-Supported strategies:
+Allowed values of `bump_version_scheme`:
 
 - minor
 - major
 - patch
+- **norelease**: Performs no release by default. Creation of release delegated to labels on Pull Requests.
 
 ## FAQ
 
-### How do I skip creation of a release?
+### Can I skip creation of a release?
 
-There are two ways to accomplish this:
+There are several approaches:
 
 1. Put `[norelease]` in the commit title.
 2. If the commit has an attached PR, add the label `norelease` to the PR.
+3. Set the action's `bump_version_scheme` to `norelease` to disable this behavior by default
 
 ### Can I change the versioning scheme by PR?
 
-Yes, if the PR has the label `release:major`, `release:minor`, or `release:patch`, this will override the default `strategy`.
+Yes, if the PR has the label `release:major`, `release:minor`, or `release:patch`, this will override `bump_version_scheme`
+
+Only one of these labels should be present on a PR. If there are multiple, the behavior is undefined.
 
 ### Do I need to setup Github Action access tokens or any other permission-related thing?
 
