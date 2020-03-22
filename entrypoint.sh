@@ -6,25 +6,29 @@ fi
 
 CURRENT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-if [ -z "${GITHUB_TOKEN}" ]; then
-    echo "error: not found GITHUB_TOKEN"
-    exit 1
-fi
+function check_preconditions {
+    if [ -z "${GITHUB_TOKEN}" ]; then
+        echo "error: not found GITHUB_TOKEN"
+        exit 1
+    fi
 
-# These are provided by actions
-if [ -z "${GITHUB_REPOSITORY}" ]; then
-    echo "error: not found GITHUB_REPOSITORY"
-    exit 1
-fi
+    # These are provided by actions
+    if [ -z "${GITHUB_REPOSITORY}" ]; then
+        echo "error: not found GITHUB_REPOSITORY"
+        exit 1
+    fi
 
-# These are provided by actions
-if [ -z "${GITHUB_SHA}" ]; then
-    echo "error: not found GITHUB_SHA"
-    exit 1
-fi
+    # These are provided by actions
+    if [ -z "${GITHUB_SHA}" ]; then
+        echo "error: not found GITHUB_SHA"
+        exit 1
+    fi
+}
 
 function fetch_related_files {
     QUERY="q=repo:${GITHUB_REPOSITORY}%20type:pr%20is:closed%20is:merged%20SHA:${GITHUB_SHA}"
+
+    # find related prs & commit info to extract the release options
     curl --silent --header "Authorization: token ${GITHUB_TOKEN}" \
          --url "https://api.github.com/search/issues?${QUERY}" \
          > related_prs
@@ -33,22 +37,24 @@ function fetch_related_files {
          --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}" \
          > last_commit
 
+    # find previous release version for bumping
     curl --silent --header "Authorization: token ${GITHUB_TOKEN}" \
          --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest" \
          > last_release
 }
 
 function pr_has_label {
-    jq --arg labelname "$1" '.items[0].labels | map_values(.name) | contains([$labelname])' -r related_prs || echo "false"
+    # If true, writes "true" to stdout if label exists in any PRs containing the SHA, otherwise writes "false"
+    jq --arg labelname "$1" '.items | map(.labels) | flatten | map_values(.name) | contains([$labelname])' -r
 }
 
 function generate_new_release_data {
     BUMP_VERSION_SCHEME="$INPUT_STRATEGY"
-    if [[ "true" == $(pr_has_label "release:patch") ]]; then
+    if [[ "true" == $(cat related_prs | pr_has_label "release:patch") ]]; then
         BUMP_VERSION_SCHEME="patch"
-    elif [[ "true" == $(pr_has_label "release:minor") ]]; then
+    elif [[ "true" == $(cat related_prs | pr_has_label "release:minor") ]]; then
         BUMP_VERSION_SCHEME="minor"
-    elif [[ "true" == $(pr_has_label "release:major") ]]; then
+    elif [[ "true" == $(cat related_prs | pr_has_label "release:major") ]]; then
         BUMP_VERSION_SCHEME="major"
     fi
 
@@ -99,7 +105,14 @@ function create_new_release {
     fi
 }
 
-fetch_related_files
-generate_new_release_data
-skip_if_norelease_set
-create_new_release
+function main {
+    check_preconditions
+    fetch_related_files
+    generate_new_release_data
+    skip_if_norelease_set
+    create_new_release
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "@"
+fi
