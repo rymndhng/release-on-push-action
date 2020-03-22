@@ -9,7 +9,7 @@ jobs:
         run: sudo npm install -g bats
 
       - name: Unit Tests
-        run: make test
+        run: bats test
 
       - name: Integration Tests
         uses: rymndhng/release-on-push-action@master
