@@ -3,10 +3,9 @@ name: 'Tag/Release on Push Action'
 description: 'Creates a Tag/Release on pushes to a branch'
 author: 'rymndhng'
 inputs:
-  bump_version_scheme:
-    description: 'The versioning scheme to use for tags. One of: minor, major, patch'
+  default_bump_version_scheme:
+    description: 'The bumping scheme to use by default. One of minor|major|patch|norelease'
     required: true
-    default: 'minor'
 runs:
   using: 'docker'
   image: 'Dockerfile'
