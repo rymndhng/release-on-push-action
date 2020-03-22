@@ -2,10 +2,15 @@ name: Tests
 on: [ push ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: rymndhng/release-on-push-action@master
+      - name: Unit Tests
+        uses: bats/bats:latest
+        run: make test
+
+      - name: Integration Tests
+        uses: rymndhng/release-on-push-action@master
         env:
           DRYRUN: 1
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
