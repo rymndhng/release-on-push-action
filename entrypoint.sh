@@ -70,7 +70,7 @@ function generate_new_release_data {
         exit 1;
     fi
 
-    LAST_TAG_NAME=$(jq ".tag_name // '0.0.0'" last_release -r || echo "0.0.0")
+    LAST_TAG_NAME=$(jq '.tag_name // "0.0.0"' last_release -r || echo "0.0.0")
     LAST_VERSION=${LAST_TAG_NAME#v}
     NEXT_VERSION=$("${CURRENT_DIR}/lib/semver" "$BUMP_VERSION_SCHEME" "$LAST_VERSION")
 
