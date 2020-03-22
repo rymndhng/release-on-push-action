@@ -5,8 +5,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Setting up BATS
+        run: sudo npm install -g bats
+
       - name: Unit Tests
-        uses: docker://bats/bats:latest
+        run: make test
 
       - name: Integration Tests
         uses: rymndhng/release-on-push-action@master
