@@ -6,8 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Unit Tests
-        uses: bats/bats:latest
-        run: make test
+        uses: docker://bats/bats:latest
 
       - name: Integration Tests
         uses: rymndhng/release-on-push-action@master
