@@ -1,8 +1,7 @@
-FROM alpine:3.10
+# See https://hub.docker.com/r/borkdude/babashka
+FROM borkdude/babashka:0.0.78
 
-# RUN apk --no-cache add openssl git curl openssh-client bash
-RUN apk --no-cache add curl bash jq
-
-COPY lib /lib
+COPY src /src
 COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT [ "/entrypoint.sh" ]
+
+ENTRYPOINT [ "./entrypoint.sh" ]
