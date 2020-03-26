@@ -69,12 +69,17 @@
                        :patch [major minor (safe-inc patch)])]
     (str/join "." next-version)))
 
+(defn first-commit-line [commit]
+  (-> (get-in commit [:commit :message] "")
+      (str/split #"\n")
+      first))
+
 (defn norelease-reason [context related-data]
   (cond
     (= :norelease (bump-version-scheme context related-data))
     "Skipping release, no version bump found."
 
-    (str/includes? (get-in related-data [:commit :message]) "[norelease]")
+    (str/includes? (first-commit-line (:commit related-data)) "[norelease]")
     "Skipping release. Reason: git commit title contains [norelease]"
 
     (contains? (get-labels (get-in related-data [:related-prs])) "norelease")
@@ -98,13 +103,15 @@
               :headers {"Authorization" (str "token " (:token context))}}))
 
 (defn -main [& args]
-  (println "Starting process")
-  (let [context      (content-from-env args)
+  (let [_            (println "Starting process...")
+        context      (content-from-env args)
+        _            (println "Fetching related data...")
         related-data (fetch-related-data context)]
     (when-let [reason (norelease-reason context related-data)]
       (println "Skipping release: " reason)
       (System/exit 0))
 
+    (println "Generating release...")
     (let [release-data (generate-new-release-data context related-data)]
       (if (:dry-run context)
         (do
