@@ -54,7 +54,7 @@
 
 (defn get-tagged-version [latest-release]
   (let [tag (get latest-release :tag-name "0.0.0")]
-    (if (.startsWith tag "v'")
+    (if (.startsWith tag "v")
       (subs tag 1)
       tag)))
 
@@ -111,4 +111,6 @@
           (println "Dry Run. Not performing release\n" (json/generate-string release-data {:pretty true})))
         (do
           (println "Executing Release\n" (json/generate-string release-data {:pretty true}))
-          (println (create-new-release! context release-data)))))))
+          ;; (println (create-new-release! context release-data))
+
+          )))))

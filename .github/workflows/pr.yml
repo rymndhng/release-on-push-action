@@ -8,16 +8,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setting up BATS
-        run: sudo npm install -g bats
+      - name: Install babashka
+        run: brew install borkdude/brew/babashka
 
       - name: Unit Tests
         run: make test
 
       - name: Integration Tests
-        run: ./entrypoint.sh
+        run: ./entrypoint.sh --dry-run
         env:
           INPUT_BUMP_VERSION_SCHEME: minor
-          DRYRUN: 1
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEBUG: true
