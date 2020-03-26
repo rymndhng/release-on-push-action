@@ -74,7 +74,7 @@
     (= "norelease" (bump-version-scheme context related-data))
     "Skipping release, no version bump found."
 
-    (contains? (get-in related-data [:commit :message]) "[norelease]")
+    (str/includes? (get-in related-data [:commit :message]) "[norelease]")
     "Skipping release. Reason: git commit title contains [norelease]"
 
     (contains? (get-labels (get-in related-data [:related-prs])) "norelease")
