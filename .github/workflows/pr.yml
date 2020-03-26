@@ -24,7 +24,7 @@ jobs:
         run: docker build . -t rymndhng/release-on-push-action
 
       - name: Container Tests
-        run: docker run -e INPUT_BUMP_VERSION_SCHEME -e GITHUB_TOKEN rymndhng/release-on-push-action --dry-run
+        run: docker run -e GITHUB_SHA -e INPUT_BUMP_VERSION_SCHEME -e GITHUB_TOKEN rymndhng/release-on-push-action --dry-run
         env:
           INPUT_BUMP_VERSION_SCHEME: minor
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
