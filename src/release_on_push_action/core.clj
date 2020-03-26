@@ -3,7 +3,7 @@
             [cheshire.core :as json]
             [clojure.string :as str]))
 
-(defn content-from-env [args]
+(defn context-from-env [args]
   {:token                     (System/getenv "GITHUB_TOKEN")
    :repo                      (System/getenv "GITHUB_REPOSITORY")
    :sha                       (System/getenv "GITHUB_SHA")
@@ -53,7 +53,7 @@
       :default (keyword (:input-bump-version-scheme context)))))
 
 (defn get-tagged-version [latest-release]
-  (let [tag (get latest-release :tag-name "0.0.0")]
+  (let [tag (get latest-release :tag_name "0.0.0")]
     (if (.startsWith tag "v")
       (subs tag 1)
       tag)))
@@ -69,12 +69,17 @@
                        :patch [major minor (safe-inc patch)])]
     (str/join "." next-version)))
 
+(defn first-commit-line [commit]
+  (-> (get-in commit [:commit :message] "")
+      (str/split #"\n")
+      first))
+
 (defn norelease-reason [context related-data]
   (cond
-    (= "norelease" (bump-version-scheme context related-data))
+    (= :norelease (bump-version-scheme context related-data))
     "Skipping release, no version bump found."
 
-    (contains? (get-in related-data [:commit :message]) "[norelease]")
+    (str/includes? (first-commit-line (:commit related-data)) "[norelease]")
     "Skipping release. Reason: git commit title contains [norelease]"
 
     (contains? (get-labels (get-in related-data [:related-prs])) "norelease")
@@ -83,7 +88,7 @@
 (defn generate-new-release-data [context related-data]
   ;; TODO: handle case when bump version scheme is invalid
   (let [bump-version-scheme (bump-version-scheme context related-data)
-        current-version     (get-tagged-version (:latest-release context))
+        current-version     (get-tagged-version (:latest-release related-data))
         next-version        (semver-bump current-version bump-version-scheme)]
     {:tag_name (str "v" next-version)
      :target_commitish (:sha context)
@@ -98,13 +103,15 @@
               :headers {"Authorization" (str "token " (:token context))}}))
 
 (defn -main [& args]
-  (println "Starting process")
-  (let [context      (content-from-env args)
+  (let [_            (println "Starting process...")
+        context      (context-from-env args)
+        _            (println "Fetching related data...")
         related-data (fetch-related-data context)]
     (when-let [reason (norelease-reason context related-data)]
       (println "Skipping release: " reason)
       (System/exit 0))
 
+    (println "Generating release...")
     (let [release-data (generate-new-release-data context related-data)]
       (if (:dry-run context)
         (do
