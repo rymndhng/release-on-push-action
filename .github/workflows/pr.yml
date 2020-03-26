@@ -19,3 +19,6 @@ jobs:
         env:
           INPUT_BUMP_VERSION_SCHEME: minor
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Container Builds
+        run: docker build -t rymndhng/release-on-push-action
