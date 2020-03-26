@@ -21,4 +21,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Container Builds
-        run: docker build -t rymndhng/release-on-push-action
+        run: docker build .
