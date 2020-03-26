@@ -15,15 +15,16 @@ jobs:
         run: make test
 
       - name: Integration Tests
-        run: ./entrypoint.sh --dry-run
+        run: bb --main release-on-push-action.core --dry-run
         env:
+          BABASHKA_CLASSPATH: src
           INPUT_BUMP_VERSION_SCHEME: minor
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Container Builds
         run: docker build . -t rymndhng/release-on-push-action
 
-      - name: Container Tests
+      - name: Container Test
         run: docker run -e INPUT_BUMP_VERSION_SCHEME -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_TOKEN rymndhng/release-on-push-action --dry-run
         env:
           INPUT_BUMP_VERSION_SCHEME: minor

@@ -105,6 +105,7 @@
 (defn -main [& args]
   (let [_            (println "Starting process...")
         context      (context-from-env args)
+        _            (println "Received context" context)
         _            (println "Fetching related data...")
         related-data (fetch-related-data context)]
     (when-let [reason (norelease-reason context related-data)]
