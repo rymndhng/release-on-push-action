@@ -50,7 +50,7 @@
       (contains? labels "release:major") :major
       (contains? labels "release:minor") :minor
       (contains? labels "release:patch") :patch
-      :default (:input-bump-version-scheme context))))
+      :default (keyword (:input-bump-version-scheme context)))))
 
 (defn get-tagged-version [latest-release]
   (let [tag (get latest-release :tag-name "0.0.0")]
