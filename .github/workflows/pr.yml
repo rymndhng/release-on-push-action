@@ -21,4 +21,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Container Builds
-        run: docker build .
+        run: docker build . -t rymndhng/release-on-push-action
+
+      - name: Container Tests
+        run: docker run rymndhng/release-on-push-action -e INPUT_BUMP_VERSION_SCHEME -e GITHUB_TOKEN --dry-run
+        env:
+          INPUT_BUMP_VERSION_SCHEME: minor
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
