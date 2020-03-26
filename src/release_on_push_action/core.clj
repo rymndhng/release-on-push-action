@@ -111,6 +111,5 @@
           (println "Dry Run. Not performing release\n" (json/generate-string release-data {:pretty true})))
         (do
           (println "Executing Release\n" (json/generate-string release-data {:pretty true}))
-          ;; (println (create-new-release! context release-data))
-
+          (println (create-new-release! context release-data))
           )))))
