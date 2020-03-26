@@ -71,7 +71,7 @@
 
 (defn norelease-reason [context related-data]
   (cond
-    (= "norelease" (bump-version-scheme context related-data))
+    (= :norelease (bump-version-scheme context related-data))
     "Skipping release, no version bump found."
 
     (str/includes? (get-in related-data [:commit :message]) "[norelease]")
