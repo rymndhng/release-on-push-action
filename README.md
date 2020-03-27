@@ -73,9 +73,15 @@ track what the last release version is. See [Release#get-the-latest-release](htt
 
 ## Development
 
-Relies on [bats](https://github.com/bats-core/bats-core).
+Uses [babashka](https://github.com/borkdude/babashka).
+
+To run tests:
+
+1. Install babashka ([link](https://github.com/borkdude/babashka#installation)).
+2. Run Tests
 
 ``` sh
+
 make test
 ```
 
