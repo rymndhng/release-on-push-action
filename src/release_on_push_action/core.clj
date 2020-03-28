@@ -3,13 +3,43 @@
             [cheshire.core :as json]
             [clojure.string :as str]))
 
-(defn context-from-env [args]
-  {:token                     (System/getenv "GITHUB_TOKEN")
-   :repo                      (System/getenv "GITHUB_REPOSITORY")
-   :sha                       (System/getenv "GITHUB_SHA")
-   :input-bump-version-scheme (System/getenv "INPUT_BUMP_VERSION_SCHEME")
-   :dry-run                   (contains? (set args) "--dry-run")})
+;; -- Configuration Parsing  ---------------------------------------------------
+(defn getenv-or-throw [name]
+  (let [val (System/getenv name)]
+    (when (empty? val)
+      (throw (ex-info (str "Expected environment variable to be set: " name)
+                      {:env/name name})))
+    val))
 
+(defn input-strategy-set? []
+  (if (System/getenv "INPUT_STRATEGY")
+    (do
+      (println "WARNING: the action property `strategy` has been renamed `bump_version_scheme`. Support for `strategy` will be removed in the future. See the rymndhng/release-on-push-action README for the current configuration")
+      true)
+    false))
+
+(defn assert-valid-bump-version-scheme [bump-version-scheme]
+  (when-not (contains? #{"major" "minor" "patch" "norelease"} bump-version-scheme)
+    (throw (ex-info (str "Invalid bump-version-scheme. Expected one of major|minor|patch|norelease. Got: " bump-version-scheme) {:bump-version-scheme bump-version-scheme})))
+  bump-version-scheme)
+
+(defn context-from-env
+  "Creates a context from environment variables and arguments to the main function."
+  [args]
+  {:token               (getenv-or-throw "GITHUB_TOKEN")
+   :repo                (getenv-or-throw "GITHUB_REPOSITORY")
+   :sha                 (getenv-or-throw "GITHUB_SHA")
+   :bump-version-scheme (assert-valid-bump-version-scheme
+                         (try
+                           (getenv-or-throw "INPUT_BUMP_VERSION_SCHEME")
+                           (catch Exception ex
+                             ;; support the old and poorly documented name: strategy
+                             (if (input-strategy-set?)
+                               (getenv-or-throw "INPUT_STRATEGY")
+                               (throw ex)))))
+   :dry-run             (contains? (set args) "--dry-run")})
+
+;; -- Github   -----------------------------------------------------------------
 (defn fetch-related-prs
   "See https://developer.github.com/v3/pulls/#list-pull-requests"
   [context]
@@ -50,7 +80,7 @@
       (contains? labels "release:major") :major
       (contains? labels "release:minor") :minor
       (contains? labels "release:patch") :patch
-      :default (keyword (:input-bump-version-scheme context)))))
+      :default (keyword (:bump-version-scheme context)))))
 
 (defn get-tagged-version [latest-release]
   (let [tag (get latest-release :tag_name "0.0.0")]
