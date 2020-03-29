@@ -2,7 +2,12 @@
 
 > Stop using files for versioning. Use git tags instead!
 
-Github Action to create a release on push. 
+Github Action to create a Github Release on pushes to master.
+
+## Features
+
+- Flexible version bumping scheme with a project default or overrides using Pull Request Labels
+- Creates Release Notes automatically (with a list of commits since the last release)
 
 ## Rationale
 
@@ -36,13 +41,14 @@ jobs:
           bump_version_scheme: minor
 ```
 
-
 Allowed values of `bump_version_scheme`:
 
 - minor
 - major
 - patch
 - **norelease**: Performs no release by default. Creation of release delegated to labels on Pull Requests.
+
+For stability, we recommend pinning the version of the action. See [Releases](https://github.com/rymndhng/release-on-push-action/releases).
 
 ## FAQ
 
@@ -54,9 +60,11 @@ There are several approaches:
 2. If the commit has an attached PR, add the label `norelease` to the PR.
 3. Set the action's `bump_version_scheme` to `norelease` to disable this behavior by default
 
-### Can I change the versioning scheme by PR?
+### How do I change the bump version scheme using Pull Requests?
 
-Yes, if the PR has the label `release:major`, `release:minor`, or `release:patch`, this will override `bump_version_scheme`
+Iif the PR has the label `release:major`, `release:minor`, or `release:patch`, this will override `bump_version_scheme`. 
+
+This repository's pull requests are an example of this in action. For example, [#19](https://github.com/rymndhng/release-on-push-action/pull/19).
 
 Only one of these labels should be present on a PR. If there are multiple, the behavior is undefined.
 
