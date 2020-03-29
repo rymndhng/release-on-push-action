@@ -92,7 +92,7 @@
         next-version        (semver-bump current-version bump-version-scheme)
 
         ;; assumption: target_commitish is always a sha and not a reference
-        summary-since-last-release (->> (github/list-commits-to-base context (:target_commitish current-version))
+        summary-since-last-release (->> (github/list-commits-to-base context (:target_commitish (:latest-release related-data)))
                                         (map github/commit-summary)
                                         (str/join "\n"))]
 
