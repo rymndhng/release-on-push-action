@@ -3,7 +3,7 @@ name: 'Tag/Release on Push Action'
 description: 'Creates a Tag/Release on pushes to a branch'
 author: 'rymndhng'
 inputs:
-  default_bump_version_scheme:
+  bump_version_scheme:
     description: 'The bumping scheme to use by default. One of minor|major|patch|norelease'
     required: true
 runs:

@@ -1,7 +1,9 @@
 (ns release-on-push-action.core
   (:require [babashka.curl :as curl]
             [cheshire.core :as json]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+
+            [release-on-push-action.github :as github]))
 
 ;; -- Configuration Parsing  ---------------------------------------------------
 (defn getenv-or-throw [name]
@@ -39,37 +41,11 @@
                                (throw ex)))))
    :dry-run             (contains? (set args) "--dry-run")})
 
-;; -- Github   -----------------------------------------------------------------
-(defn fetch-related-prs
-  "See https://developer.github.com/v3/pulls/#list-pull-requests"
-  [context]
-  (let [resp (curl/get "https://api.github.com/search/issues"
-                       {:headers      {"Authorization" (str "token " (:token context))}
-                        :query-params {"q" (format "repo:%s type:pr is:closed is:merged SHA:%s"
-                                                   (:repo context)
-                                                   (:sha context))}})]
-    (json/parse-string resp true)))
-
-(defn fetch-commit
-  "See https://developer.github.com/v3/repos/commits/"
-  [context]
-  (let [resp (curl/get
-              (format "https://api.github.com/repos/%s/commits/%s" (:repo context) (:sha context))
-              {:headers {"Authorization" (str "token " (:token context))}})]
-    (json/parse-string resp true)))
-
-(defn fetch-latest-release
-  "See https://developer.github.com/v3/repos/releases/#get-the-latest-release"
-  [context]
-  (let [resp (curl/get
-              (format "https://api.github.com/repos/%s/releases/latest" (:repo context))
-              {:headers {"Authorization" (str "token " (:token context))}})]
-    (json/parse-string resp true)))
-
+;; -- Version Bumping Logic  ---------------------------------------------------
 (defn fetch-related-data [context]
-  {:related-prs    (fetch-related-prs context)
-   :commit         (fetch-commit context)
-   :latest-release (fetch-latest-release context)})
+  {:related-prs    (:body (github/fetch-related-prs context))
+   :commit         (:body (github/fetch-commit context))
+   :latest-release (:body (github/fetch-latest-release context))})
 
 (defn get-labels [related-prs]
   (->> related-prs :items (map :labels) flatten (map :name) set))
@@ -99,33 +75,33 @@
                        :patch [major minor (safe-inc patch)])]
     (str/join "." next-version)))
 
-(defn first-commit-line [commit]
-  (-> (get-in commit [:commit :message] "")
-      (str/split #"\n")
-      first))
-
 (defn norelease-reason [context related-data]
   (cond
     (= :norelease (bump-version-scheme context related-data))
     "Skipping release, no version bump found."
 
-    (str/includes? (first-commit-line (:commit related-data)) "[norelease]")
+    (str/includes? (github/commit-title (:commit related-data)) "[norelease]")
     "Skipping release. Reason: git commit title contains [norelease]"
 
     (contains? (get-labels (get-in related-data [:related-prs])) "norelease")
     "Skipping release. Reason: related PR has label norelease"))
 
 (defn generate-new-release-data [context related-data]
-  ;; TODO: handle case when bump version scheme is invalid
   (let [bump-version-scheme (bump-version-scheme context related-data)
         current-version     (get-tagged-version (:latest-release related-data))
-        next-version        (semver-bump current-version bump-version-scheme)]
-    {:tag_name (str "v" next-version)
+        next-version        (semver-bump current-version bump-version-scheme)
+
+        ;; assumption: target_commitish is always a sha and not a reference
+        summary-since-last-release (->> (github/list-commits-to-base context (:target_commitish (:latest-release related-data)))
+                                        (map github/commit-summary)
+                                        (str/join "\n"))]
+
+    {:tag_name         (str "v" next-version)
      :target_commitish (:sha context)
-     :name next-version
-     :body (str "Version " next-version)
-     :draft false
-     :prerelease true}))
+     :name             next-version
+     :body             (format "Version %s\n\n### Commits\n\n%s" next-version summary-since-last-release)
+     :draft            false
+     :prerelease       true}))
 
 (defn create-new-release! [context new-release-data]
   (curl/post (format "https://api.github.com/repos/%s/releases" (:repo context))
