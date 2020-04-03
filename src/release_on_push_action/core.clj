@@ -104,9 +104,13 @@
      :prerelease       true}))
 
 (defn create-new-release! [context new-release-data]
-  (curl/post (format "https://api.github.com/repos/%s/releases" (:repo context))
-             {:body    (json/generate-string new-release-data)
-              :headers {"Authorization" (str "token " (:token context))}}))
+  ;; Use a file because the release data may be too large for an inline curl arg
+  (let [file (java.io.File/creatTempFile "release" ".json")]
+    (.deleteOnExit file)
+    (json/encode-stream new-release-data (clojure.java.io/writer file))
+    (curl/post (format "https://api.github.com/repos/%s/releases" (:repo context))
+               {:body    file
+                :headers {"Authorization" (str "token " (:token context))}})))
 
 (defn -main [& args]
   (let [_            (println "Starting process...")
