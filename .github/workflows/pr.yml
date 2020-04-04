@@ -2,6 +2,19 @@ name: Tests
 on: [ push ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install clj-kondo
+        run: sudo ./bin/install_cljkondo.sh
+
+      - name: Run clj-kondo
+        run: |
+          clj-kondo --lint src --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
+
   test:
     runs-on: ubuntu-latest
     steps:

@@ -112,9 +112,8 @@
 (defn commit-summary [commit]
   (format "- [%s] %s" (subs (:sha commit) 0 8) (commit-title commit)))
 
-(defn -main []
+(comment
   ;; used for testing
-
   (def context {:repo "rymndhng/release-on-push-action"
                 :sha "167c690247d0933acde636d72352bcd67e33724b"})
 
