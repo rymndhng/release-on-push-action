@@ -8,7 +8,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install clj-kondo
-      run: sudo bash <(curl -s https://raw.githubusercontent.com/borkdude/clj-kondo/master/script/install-clj-kondo)
+      run: sudo ./bin/install_cljkondo.sh
 
     - name: Run clj-kondo
       run: |
