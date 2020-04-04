@@ -5,14 +5,15 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Install clj-kondo
-      run: sudo ./bin/install_cljkondo.sh
+      - name: Install clj-kondo
+        run: sudo ./bin/install_cljkondo.sh
 
-    - name: Run clj-kondo
-      run: |
-        clj-kondo --lint src | awk -F' *: *' '{ print "::" $4 " file=" $1 ",line=" $2 ",col=" $3 "::" $5 }'
+      - name: Run clj-kondo
+        run: |
+          clj-kondo --lint src | awk -F' *: *' '{ print "::" $4 " file=" $1 ",line=" $2 ",col=" $3 "::" $5 }'
 
   test:
     runs-on: ubuntu-latest
