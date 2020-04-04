@@ -2,6 +2,7 @@
   (:require [babashka.curl :as curl]
             [cheshire.core :as json]
             [clojure.string :as str]
+            [clojure.java.io]
 
             [release-on-push-action.github :as github]))
 
@@ -56,7 +57,7 @@
       (contains? labels "release:major") :major
       (contains? labels "release:minor") :minor
       (contains? labels "release:patch") :patch
-      :default (keyword (:bump-version-scheme context)))))
+      :else (keyword (:bump-version-scheme context)))))
 
 (defn get-tagged-version [latest-release]
   (let [tag (get latest-release :tag_name "0.0.0")]
@@ -125,8 +126,7 @@
     (println "Generating release...")
     (let [release-data (generate-new-release-data context related-data)]
       (if (:dry-run context)
-        (do
-          (println "Dry Run. Not performing release\n" (json/generate-string release-data {:pretty true})))
+        (println "Dry Run. Not performing release\n" (json/generate-string release-data {:pretty true}))
         (do
           (println "Executing Release\n" (json/generate-string release-data {:pretty true}))
           (println (create-new-release! context release-data))
