@@ -2,6 +2,18 @@ name: Tests
 on: [ push ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install clj-kondo
+      run: sudo bash <(curl -s https://raw.githubusercontent.com/borkdude/clj-kondo/master/script/install-clj-kondo)
+
+    - name: Run clj-kondo
+      run: |
+        clj-kondo --lint src | awk -F' *: *' '{ print "::" $4 " file=" $1 ",line=" $2 ",col=" $3 "::" $5 }'
+
   test:
     runs-on: ubuntu-latest
     steps:
