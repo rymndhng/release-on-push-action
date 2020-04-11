@@ -89,8 +89,11 @@ To run tests:
 2. Run Tests
 
 ``` sh
-
 make test
+
+# run integration tests
+source local-test.env
+make integration-tests
 ```
 
 
