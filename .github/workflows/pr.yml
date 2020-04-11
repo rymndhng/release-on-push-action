@@ -42,3 +42,14 @@ jobs:
         env:
           INPUT_BUMP_VERSION_SCHEME: minor
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Disable me if needed to debug curl/post action
+  # create-prerelease:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: rymndhng/release-on-push-action@debug-npe
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         CREATE_DRAFT: true
+  #       with:
+  #         bump_version_scheme: patch
