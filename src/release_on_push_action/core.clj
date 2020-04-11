@@ -102,7 +102,7 @@
      :name             next-version
      :body             (format "Version %s\n\n### Commits\n\n%s" next-version summary-since-last-release)
      :draft            false
-     :prerelease       true}))
+     :prerelease       false}))
 
 (defn create-new-release! [context new-release-data]
   ;; Use a file because the release data may be too large for an inline curl arg

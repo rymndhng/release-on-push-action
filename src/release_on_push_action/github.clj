@@ -4,20 +4,6 @@
             [cheshire.core :as json]))
 
 ;; -- Generic HTTP Helpers  ----------------------------------------------------
-(defn resp->map
-  "See https://gist.github.com/dainiusjocas/d2a5ca60ae25cd260f37b7c125a0b2e6"
-  [resp]
-  (let [lines   (str/split resp #"\r\n")
-        status  (Integer/parseInt (second (str/split (first lines) #" ")))
-        headers (reduce (fn [acc header-line]
-                          (let [[k v] (str/split header-line #":" 2)]
-                            (assoc acc (str/lower-case k) (str/trim v))))
-                        {}
-                        (remove str/blank? (drop-last (rest lines))))]
-    {:body    (last lines)
-     :status  status
-     :headers headers}))
-
 (defn link-header->map
   "Converts link header into a map of rel -> link. This implementation is not standards compliant.
 
@@ -35,7 +21,6 @@
 
 (defn parse-response [resp]
   (-> resp
-      (resp->map)
       (with-links)
       (update :body json/parse-string true)))
 
@@ -43,8 +28,7 @@
 (defn follow-link [context link]
   (parse-response
    (curl/get link
-             {:headers {"Authorization" (str "token " (:token context))}
-              :raw-args ["-i"]})))
+             {:headers {"Authorization" (str "token " (:token context))}})))
 
 (defn paginate
   "Paginate a resopnse with a context object"
@@ -62,7 +46,6 @@
   (parse-response
    (curl/get "https://api.github.com/search/issues"
              {:headers      {"Authorization" (str "token " (:token context))}
-              :raw-args     ["-i"]
               :query-params {"q" (format "repo:%s type:pr is:closed is:merged SHA:%s" (:repo context) (:sha context))}})))
 
 ;; -- Github Releases API  -----------------------------------------------------
@@ -72,8 +55,7 @@
   (parse-response
    (curl/get
     (format "https://api.github.com/repos/%s/releases/latest" (:repo context))
-    {:headers {"Authorization" (str "token " (:token context))}
-     :raw-args ["-i"]})))
+    {:headers {"Authorization" (str "token " (:token context))}})))
 
 ;; -- Github Commit API  -------------------------------------------------------
 (defn fetch-commit
@@ -81,8 +63,7 @@
   [context]
   (parse-response
    (curl/get (format "https://api.github.com/repos/%s/commits/%s" (:repo context) (:sha context))
-             {:headers {"Authorization" (str "token " (:token context))}
-              :raw-args ["-i"]})))
+             {:headers {"Authorization" (str "token " (:token context))}})))
 
 (defn list-commits
   "Gets all commits between two commit shas.
@@ -91,8 +72,7 @@
   [context]
   (parse-response
    (curl/get (format "https://api.github.com/repos/%s/commits" (:repo context))
-             {:headers {"Authorization" (str "token " (:token context))}
-              :raw-args ["-i"]
+             {:headers      {"Authorization" (str "token " (:token context))}
               :query-params {"sha" (:sha context)}})))
 
 (defn list-commits-to-base
