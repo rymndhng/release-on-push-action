@@ -1,7 +1,7 @@
 .PHONY: test integration-test
 
 repl:
-	~/Downloads/bb --verbose --classpath "src" --nrepl-server
+	bb --verbose --classpath "src" --nrepl-server
 
 test:
 	bb --classpath "src:test" run_tests.clj
