@@ -28,7 +28,7 @@ jobs:
         run: make test
 
       - name: Integration Tests
-        run: bb --main release-on-push-action.core --dry-run
+        run: make integration-test
         env:
           BABASHKA_CLASSPATH: src
           INPUT_BUMP_VERSION_SCHEME: minor
