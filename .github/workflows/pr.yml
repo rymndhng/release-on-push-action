@@ -8,8 +8,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install clj-kondo
-        run: sudo ./bin/install_cljkondo.sh
+      - uses: DeLaGuardo/setup-clj-kondo@v1
+        with:
+          version: '2020.04.05'
 
       - name: Run clj-kondo
         run: |
