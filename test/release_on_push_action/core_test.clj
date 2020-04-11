@@ -1,5 +1,5 @@
 (ns release-on-push-action.core-test
-  (:require [clojure.test :refer [deftest is are]]
+  (:require [clojure.test :refer [deftest is are testing]]
             [release-on-push-action.core :as sut]))
 
 (deftest get-tagged-version
@@ -8,3 +8,25 @@
     "0.0.0" "0.0.0"
     "1.0.0" "v1.0.0"
     "1.0.0" "1.0.0"))
+
+(deftest semver-bump
+  (testing "patch bump"
+    (are [expected input] (= expected (sut/semver-bump input :patch))
+        "0.0.1" "0.0.0"
+        "0.0.2" "0.0.1"
+        "0.1.1" "0.1.0"
+        "1.1.1" "1.1.0"))
+
+  (testing "minor bump"
+    (are [expected input] (= expected (sut/semver-bump input :minor))
+        "0.1.0" "0.0.0"
+        "0.1.0" "0.0.1"
+        "0.2.0" "0.1.0"
+        "1.2.0" "1.1.0"))
+
+  (testing "major bump"
+    (are [expected input] (= expected (sut/semver-bump input :major))
+      "1.0.0" "0.0.0"
+      "1.0.0" "0.0.1"
+      "1.0.0" "0.1.0"
+      "2.0.0" "1.1.0")))
