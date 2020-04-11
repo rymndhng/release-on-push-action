@@ -24,6 +24,8 @@ jobs:
 
       - name: Install babashka
         run: sudo ./bin/install_babashka.sh
+        env:
+          BABASHKA_VERSION: 0.0.82
 
       - name: Unit Tests
         run: make test

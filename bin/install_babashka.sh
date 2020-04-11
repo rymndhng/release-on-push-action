@@ -19,7 +19,7 @@ fi
 
 download_dir=/tmp
 
-latest_release="$(curl -sL https://raw.githubusercontent.com/borkdude/babashka/master/resources/BABASHKA_RELEASED_VERSION)"
+latest_release="${BABASHKA_VERSION:-$(curl -sL https://raw.githubusercontent.com/borkdude/babashka/master/resources/BABASHKA_RELEASED_VERSION)}"
 
 case "$(uname -s)" in
     Linux*)     platform=linux;;
