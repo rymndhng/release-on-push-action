@@ -31,11 +31,15 @@ jobs:
         run: make test
 
       - name: Integration Tests
+        id: integration-tests
         run: make integration-test
         env:
           BABASHKA_CLASSPATH: src
           INPUT_BUMP_VERSION_SCHEME: minor
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check Output Parameters
+        run: echo "Got version ${{ steps.integration-tests.outputs.tag_name }}"
 
       - name: Container Builds
         run: docker build . -t rymndhng/release-on-push-action

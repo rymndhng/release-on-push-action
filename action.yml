@@ -6,6 +6,9 @@ inputs:
   bump_version_scheme:
     description: 'The bumping scheme to use by default. One of minor|major|patch|norelease'
     required: true
+outputs:
+  tag_name:
+    description: 'Tag of released version.'
 runs:
   using: 'docker'
   image: 'Dockerfile'
