@@ -7,7 +7,7 @@ inputs:
     description: 'The bumping scheme to use by default. One of minor|major|patch|norelease'
     required: true
 outputs:
-  release_on_push_action_tag:
+  tag_name:
     description: 'Tag of released version.'
 runs:
   using: 'docker'

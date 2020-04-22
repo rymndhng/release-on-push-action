@@ -79,6 +79,33 @@ Currently, no.
 In order to reliably generate monotonic versions, we use Github Releases to
 track what the last release version is. See [Release#get-the-latest-release](https://developer.github.com/v3/repos/releases/#get-the-latest-release).
 
+### How can I get the generated tag version?
+
+On a successful release, this action creates create an output parameter `tag_name`. 
+
+Example of how to consume this:
+
+``` yaml
+on: 
+  push:
+    branches:
+      - master
+
+jobs:
+  release-on-push:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - id: release
+        uses: rymndhng/release-on-push-action@v0.14.0
+        with:
+          bump_version_scheme: minor
+          
+      - name: Check Output Parameters
+        run: echo "Got version ${{ steps.release.outputs.tag_name }}"
+```
+
 ## Development
 
 Uses [babashka](https://github.com/borkdude/babashka).
