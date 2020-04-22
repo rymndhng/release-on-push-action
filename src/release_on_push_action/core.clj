@@ -113,6 +113,14 @@
                {:body    file
                 :headers {"Authorization" (str "token " (:token context))}})))
 
+(defn set-output-parameters!
+  "Sets output parameters for additional tasks to consume.
+
+  See https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
+  "
+  [release-data]
+  (println "::set-output name=release_on_push_action_tag::" (:tag-name release-data)))
+
 (defn -main [& args]
   (let [_            (println "Starting process...")
         context      (context-from-env args)
@@ -129,5 +137,5 @@
         (println "Dry Run. Not performing release\n" (json/generate-string release-data {:pretty true}))
         (do
           (println "Executing Release\n" (json/generate-string release-data {:pretty true}))
-          (println (create-new-release! context release-data))
-          )))))
+          (println (create-new-release! context release-data))))
+      (set-output-parameters! release-data))))
