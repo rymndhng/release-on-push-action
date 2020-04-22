@@ -119,6 +119,7 @@
   See https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
   "
   [release-data]
+  (printf "hello world!\n")
   (printf "::set-output name=tag_name::%s\n" (:tag-name release-data)))
 
 (defn -main [& args]
