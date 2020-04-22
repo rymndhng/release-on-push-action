@@ -120,7 +120,7 @@
   "
   [release-data]
   (printf "hello world!\n")
-  (printf "::set-output name=tag_name::%s\n" (:tag-name release-data)))
+  (printf "::set-output name=tag_name::%s\n" (:tag_name release-data)))
 
 (defn -main [& args]
   (let [_            (println "Starting process...")
