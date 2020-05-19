@@ -119,7 +119,8 @@
   See https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
   "
   [release-data]
-  (printf "::set-output name=tag_name::%s\n" (:tag_name release-data)))
+  (printf "::set-output name=tag_name::%s\n" (:tag_name release-data))
+  (printf "::set-output name=name::%s\n" (:name release-data)))
 
 (defn -main [& args]
   (let [_            (println "Starting process...")
