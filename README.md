@@ -81,7 +81,7 @@ track what the last release version is. See [Release#get-the-latest-release](htt
 
 ### How can I get the generated tag or version?
 
-On a successful release, this action creates create an output parameters `tag_name` and `output`. 
+On a successful release, this action creates an output parameters `tag_name` and `name`. 
 
 Example of how to consume this:
 
