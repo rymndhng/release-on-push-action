@@ -103,7 +103,7 @@ jobs:
           bump_version_scheme: minor
           
       - name: Check tag Output Parameter
-        run: echo "Got version ${{ steps.release.outputs.tag_name }}"
+        run: echo "Got tag name ${{ steps.release.outputs.tag_name }}"
 
       - name: Check version Output Parameter
         run: echo "Got version ${{ steps.release.outputs.name }}"
