@@ -99,7 +99,7 @@
 
     {:tag_name         (str "v" next-version)
      :target_commitish (:sha context)
-     :version          next-version
+     :name             next-version
      :body             (format "Version %s\n\n### Commits\n\n%s" next-version summary-since-last-release)
      :draft            false
      :prerelease       false}))
@@ -120,7 +120,7 @@
   "
   [release-data]
   (printf "::set-output name=tag_name::%s\n" (:tag_name release-data))
-  (printf "::set-output name=version::%s\n" (:version release-data)))
+  (printf "::set-output name=version::%s\n" (:name release-data)))
 
 (defn -main [& args]
   (let [_            (println "Starting process...")
