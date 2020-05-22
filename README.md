@@ -81,7 +81,7 @@ track what the last release version is. See [Release#get-the-latest-release](htt
 
 ### How can I get the generated tag or version?
 
-On a successful release, this action creates an output parameters `tag_name` and `name`. 
+On a successful release, this action creates an output parameters `tag_name` and `version`. 
 
 Example of how to consume this:
 
@@ -102,11 +102,10 @@ jobs:
         with:
           bump_version_scheme: minor
           
-      - name: Check tag Output Parameter
-        run: echo "Got tag name ${{ steps.release.outputs.tag_name }}"
-
-      - name: Check version Output Parameter
-        run: echo "Got version ${{ steps.release.outputs.name }}"
+      - name: Check Output Parameters
+        run: |
+          echo "Got tag name ${{ steps.release.outputs.tag_name }}"
+          echo "Got release version ${{ steps.release.outputs.version }}"
 ```
 
 ## Development
