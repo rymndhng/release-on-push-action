@@ -79,9 +79,9 @@ Currently, no.
 In order to reliably generate monotonic versions, we use Github Releases to
 track what the last release version is. See [Release#get-the-latest-release](https://developer.github.com/v3/repos/releases/#get-the-latest-release).
 
-### How can I get the generated tag version?
+### How can I get the generated tag or version?
 
-On a successful release, this action creates create an output parameter `tag_name`. 
+On a successful release, this action creates an output parameters `tag_name` and `version`. 
 
 Example of how to consume this:
 
@@ -98,12 +98,14 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - id: release
-        uses: rymndhng/release-on-push-action@v0.14.0
+        uses: rymndhng/release-on-push-action@master
         with:
           bump_version_scheme: minor
           
       - name: Check Output Parameters
-        run: echo "Got version ${{ steps.release.outputs.tag_name }}"
+        run: |
+          echo "Got tag name ${{ steps.release.outputs.tag_name }}"
+          echo "Got release version ${{ steps.release.outputs.version }}"
 ```
 
 ## Development

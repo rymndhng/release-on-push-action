@@ -39,7 +39,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check Output Parameters
-        run: echo "Got version ${{ steps.integration-tests.outputs.tag_name }}"
+        run: |
+          echo "Got tag version ${{ steps.integration-tests.outputs.tag_name }}"
+          echo "Got version ${{ steps.integration-tests.outputs.version }}"
 
       - name: Container Builds
         run: docker build . -t rymndhng/release-on-push-action

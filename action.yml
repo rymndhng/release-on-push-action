@@ -8,7 +8,9 @@ inputs:
     required: true
 outputs:
   tag_name:
-    description: 'Tag of released version.'
+    description: 'Tag of released version'
+  version:
+    description: 'Version of release'
 runs:
   using: 'docker'
   image: 'Dockerfile'
