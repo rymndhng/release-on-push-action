@@ -1,6 +1,6 @@
 # action.yml
 name: 'Tag/Release on Push Action'
-description: 'Creates a Tag/Release on pushes to a branch'
+description: 'Creates a Tag/Release on Push. Generates Release Notes. Customizable with Pull Request Labels'
 author: 'rymndhng'
 inputs:
   bump_version_scheme:
