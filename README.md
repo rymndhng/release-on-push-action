@@ -108,6 +108,31 @@ jobs:
           echo "Got release version ${{ steps.release.outputs.version }}"
 ```
 
+### Can I customize the release body message?
+
+Yes you can, with `release_body`. The contents of this be appended to the release description.
+
+Example:
+
+``` yaml
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release-on-push:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: rymndhng/release-on-push-action@master
+        with:
+          bump_version_scheme: minor
+          release_body: "When set, adds extra text to body!"
+```
+
+
 ## Development
 
 Uses [babashka](https://github.com/borkdude/babashka).

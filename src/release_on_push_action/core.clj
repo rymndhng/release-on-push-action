@@ -32,6 +32,7 @@
   {:token               (getenv-or-throw "GITHUB_TOKEN")
    :repo                (getenv-or-throw "GITHUB_REPOSITORY")
    :sha                 (getenv-or-throw "GITHUB_SHA")
+   :input/release-body  (System/getenv "INPUT_RELEASE_BODY")
    :bump-version-scheme (assert-valid-bump-version-scheme
                          (try
                            (getenv-or-throw "INPUT_BUMP_VERSION_SCHEME")
@@ -100,7 +101,12 @@
     {:tag_name         (str "v" next-version)
      :target_commitish (:sha context)
      :name             next-version
-     :body             (format "Version %s\n\n### Commits\n\n%s" next-version summary-since-last-release)
+     :body             (with-out-str
+                         (printf "Version %s\n\n" next-version)
+                         (when-let [body (:input/release-body context)]
+                           (println body))
+                         (printf "### Commits\n\n")
+                         (println summary-since-last-release))
      :draft            false
      :prerelease       false}))
 
@@ -135,7 +141,10 @@
     (println "Generating release...")
     (let [release-data (generate-new-release-data context related-data)]
       (if (:dry-run context)
-        (println "Dry Run. Not performing release\n" (json/generate-string release-data {:pretty true}))
+        (do
+          (println "Dry Run. Not performing release\n" (json/generate-string release-data {:pretty true}))
+          (println "Release Body")
+          (println (:body release-data)))
         (do
           (println "Executing Release\n" (json/generate-string release-data {:pretty true}))
           (println (create-new-release! context release-data))))
