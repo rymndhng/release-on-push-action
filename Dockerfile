@@ -1,5 +1,5 @@
 # See https://hub.docker.com/r/borkdude/babashka
-FROM borkdude/babashka:0.0.88
+FROM borkdude/babashka:0.2.3
 
 WORKDIR /var/src/release-on-push-action
 
