@@ -6,6 +6,9 @@ inputs:
   bump_version_scheme:
     description: 'The bumping scheme to use by default. One of minor|major|patch|norelease'
     required: true
+  release_body:
+    description: "Additional text to insert into the release's body."
+    required: false
 outputs:
   tag_name:
     description: 'Tag of released version'
