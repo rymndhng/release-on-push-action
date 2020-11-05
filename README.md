@@ -39,6 +39,7 @@ jobs:
       - uses: rymndhng/release-on-push-action@master
         with:
           bump_version_scheme: minor
+          release_body: "If set, will add this body to the release body!"
 ```
 
 Allowed values of `bump_version_scheme`:
@@ -49,6 +50,10 @@ Allowed values of `bump_version_scheme`:
 - **norelease**: Performs no release by default. Creation of release delegated to labels on Pull Requests.
 
 For stability, we recommend pinning the version of the action. See [Releases](https://github.com/rymndhng/release-on-push-action/releases).
+
+`release_body`:
+
+When set, adds the text to the release body.
 
 ## FAQ
 
