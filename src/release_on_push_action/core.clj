@@ -33,6 +33,7 @@
    :repo                (getenv-or-throw "GITHUB_REPOSITORY")
    :sha                 (getenv-or-throw "GITHUB_SHA")
    :input/release-body  (System/getenv "INPUT_RELEASE_BODY")
+   :input/tag-prefix    (get (System/getenv) "INPUT_TAG_PREFIX" "v") ;allows passing in an empty string as a valid value
    :bump-version-scheme (assert-valid-bump-version-scheme
                          (try
                            (getenv-or-throw "INPUT_BUMP_VERSION_SCHEME")
@@ -60,10 +61,10 @@
       (contains? labels "release:patch") :patch
       :else (keyword (:bump-version-scheme context)))))
 
-(defn get-tagged-version [latest-release]
+(defn get-tagged-version [prefix latest-release]
   (let [tag (get latest-release :tag_name "0.0.0")]
-    (if (.startsWith tag "v")
-      (subs tag 1)
+    (if (.startsWith tag prefix)
+      (subs tag (count prefix))
       tag)))
 
 (defn safe-inc [n]
@@ -90,7 +91,7 @@
 
 (defn generate-new-release-data [context related-data]
   (let [bump-version-scheme (bump-version-scheme context related-data)
-        current-version     (get-tagged-version (:latest-release related-data))
+        current-version     (get-tagged-version (:input/tag-prefix context) (:latest-release related-data))
         next-version        (semver-bump current-version bump-version-scheme)
 
         ;; assumption: target_commitish is always a sha and not a reference
@@ -98,7 +99,7 @@
                                         (map github/commit-summary)
                                         (str/join "\n"))]
 
-    {:tag_name         (str "v" next-version)
+    {:tag_name         (str (:input/tag-prefix context) next-version)
      :target_commitish (:sha context)
      :name             next-version
      :body             (with-out-str

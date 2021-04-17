@@ -101,6 +101,7 @@ jobs:
         uses: rymndhng/release-on-push-action@master
         with:
           bump_version_scheme: minor
+          tag_prefix: v
           
       - name: Check Output Parameters
         run: |
@@ -132,6 +133,27 @@ jobs:
           release_body: "When set, adds extra text to body!"
 ```
 
+### Can I change the prefix `v` from the Git Tags?
+
+Yes, you can customize this by changing the `tag_prefix`. Here's an example of
+removing the prefix by using an empty string.
+ 
+``` yaml
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release-on-push:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: rymndhng/release-on-push-action@master
+        with:
+          tag_prefix: ""
+```
 
 ## Development
 
