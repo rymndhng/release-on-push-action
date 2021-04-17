@@ -61,11 +61,10 @@
       (contains? labels "release:patch") :patch
       :else (keyword (:bump-version-scheme context)))))
 
-(defn get-tagged-version [prefix latest-release]
-  (let [tag (get latest-release :tag_name "0.0.0")]
-    (if (.startsWith tag prefix)
-      (subs tag (count prefix))
-      tag)))
+(defn get-tagged-version [latest-release]
+  (let [tag      (get latest-release :tag_name "0.0.0")
+        [prefix] (str/split tag #"\d+\.\d+\.\d+")] ;this strips any leading characters before the semver string
+    (subs tag (count prefix))))
 
 (defn safe-inc [n]
   (inc (or n 0)))
@@ -91,7 +90,7 @@
 
 (defn generate-new-release-data [context related-data]
   (let [bump-version-scheme (bump-version-scheme context related-data)
-        current-version     (get-tagged-version (:input/tag-prefix context) (:latest-release related-data))
+        current-version     (get-tagged-version (:latest-release related-data))
         next-version        (semver-bump current-version bump-version-scheme)
 
         ;; assumption: target_commitish is always a sha and not a reference
