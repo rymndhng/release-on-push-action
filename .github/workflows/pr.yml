@@ -46,13 +46,14 @@ jobs:
         run: docker build . -t rymndhng/release-on-push-action
 
       - name: Container Test
-        run: docker run -e INPUT_BUMP_VERSION_SCHEME -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_TOKEN rymndhng/release-on-push-action --dry-run
+        run: docker run -e INPUT_BUMP_VERSION_SCHEME -e INPUT_TAG_PREFIX -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_TOKEN rymndhng/release-on-push-action --dry-run
         env:
           INPUT_BUMP_VERSION_SCHEME: minor
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_TAG_PREFIX: v
 
       - name: Container Test with Release Notes
-        run: docker run -e INPUT_BUMP_VERSION_SCHEME -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_TOKEN -e INPUT_RELEASE_BODY rymndhng/release-on-push-action --dry-run
+        run: docker run -e INPUT_BUMP_VERSION_SCHEME -e INPUT_TAG_PREFIX -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_TOKEN -e INPUT_RELEASE_BODY rymndhng/release-on-push-action --dry-run
         env:
           INPUT_RELEASE_BODY: |
             This is a test
@@ -60,6 +61,19 @@ jobs:
 
             Does it work?
           INPUT_BUMP_VERSION_SCHEME: minor
+          INPUT_TAG_PREFIX: v
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Container Test with no prefix
+        run: docker run -e INPUT_BUMP_VERSION_SCHEME -e INPUT_TAG_PREFIX -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_TOKEN -e INPUT_RELEASE_BODY rymndhng/release-on-push-action --dry-run
+        env:
+          INPUT_RELEASE_BODY: |
+            This is a test
+            with multi-line input
+
+            Does it work?
+          INPUT_BUMP_VERSION_SCHEME: minor
+          INPUT_TAG_PREFIX:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Disable me if needed to debug curl/post action
