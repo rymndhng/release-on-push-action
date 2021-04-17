@@ -10,8 +10,9 @@ inputs:
     description: "Additional text to insert into the release's body."
     required: false
   tag_prefix:
-    description: "Prefix to append to git tags. Defaults to `v`. To unset this, set version_prefix to an empty string."
+    description: "Prefix to append to git tags. To unset this, set version_prefix to an empty string."
     required: false
+    default: 'v'
 outputs:
   tag_name:
     description: 'Tag of released version'

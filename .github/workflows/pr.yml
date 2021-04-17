@@ -34,6 +34,7 @@ jobs:
         env:
           BABASHKA_CLASSPATH: src
           INPUT_BUMP_VERSION_SCHEME: minor
+          INPUT_TAG_PREFIX: v
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check Output Parameters

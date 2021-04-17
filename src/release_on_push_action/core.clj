@@ -33,7 +33,7 @@
    :repo                (getenv-or-throw "GITHUB_REPOSITORY")
    :sha                 (getenv-or-throw "GITHUB_SHA")
    :input/release-body  (System/getenv "INPUT_RELEASE_BODY")
-   :input/tag-prefix    (get (System/getenv) "INPUT_TAG_PREFIX" "v") ;allows passing in an empty string as a valid value
+   :input/tag-prefix    (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
    :bump-version-scheme (assert-valid-bump-version-scheme
                          (try
                            (getenv-or-throw "INPUT_BUMP_VERSION_SCHEME")
