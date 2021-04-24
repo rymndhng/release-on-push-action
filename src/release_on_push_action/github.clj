@@ -61,8 +61,9 @@
       {:headers {"Authorization" (str "token " (:token context))}}))
     (catch clojure.lang.ExceptionInfo ex
       (cond
-        ;; No previous release created
-        (= 404 (:status (ex-data ex))) nil
+        ;; No previous release created, return nil
+        (= 404 (:status (ex-data ex)))
+        (println "No release found for project.")
 
         :else (throw ex)))))
 
