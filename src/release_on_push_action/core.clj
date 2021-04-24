@@ -88,16 +88,21 @@
     (contains? (get-labels (get-in related-data [:related-prs])) "norelease")
     "Skipping release. Reason: related PR has label norelease"))
 
+;; Note: at 500, I suspect this list will be unproductive to view
+(def max-commits-to-summarize
+  "This is the maximum number of commits to summarize."
+  500)
+
 (defn generate-new-release-data [context related-data]
   (let [bump-version-scheme (bump-version-scheme context related-data)
         current-version     (get-tagged-version (:latest-release related-data))
         next-version        (semver-bump current-version bump-version-scheme)
+        base-commit         (get-in related-data [:latest-release :target_commitish])
 
-        ;; assumption: target_commitish is always a sha and not a reference
-        summary-since-last-release (->> (github/list-commits-to-base context (:target_commitish (:latest-release related-data)))
+        summary-since-last-release (->> (github/list-commits-to-base context base-commit)
+                                        (take max-commits-to-summarize)
                                         (map github/commit-summary)
                                         (str/join "\n"))]
-
     {:tag_name         (str (:input/tag-prefix context) next-version)
      :target_commitish (:sha context)
      :name             next-version

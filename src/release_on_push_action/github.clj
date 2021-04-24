@@ -50,12 +50,21 @@
 
 ;; -- Github Releases API  -----------------------------------------------------
 (defn fetch-latest-release
-  "See https://developer.github.com/v3/repos/releases/#get-the-latest-release"
+  "Gets the latest commit. Returns nil when there is no release.
+
+  See https://developer.github.com/v3/repos/releases/#get-the-latest-release"
   [context]
-  (parse-response
-   (curl/get
-    (format "https://api.github.com/repos/%s/releases/latest" (:repo context))
-    {:headers {"Authorization" (str "token " (:token context))}})))
+  (try
+    (parse-response
+     (curl/get
+      (format "https://api.github.com/repos/%s/releases/latest" (:repo context))
+      {:headers {"Authorization" (str "token " (:token context))}}))
+    (catch clojure.lang.ExceptionInfo ex
+      (cond
+        ;; No previous release created
+        (= 404 (:status (ex-data ex))) nil
+
+        :else (throw ex)))))
 
 ;; -- Github Commit API  -------------------------------------------------------
 (defn fetch-commit
@@ -76,7 +85,10 @@
               :query-params {"sha" (:sha context)}})))
 
 (defn list-commits-to-base
-  "Returns a lazy sequence of commits from :sha of context to base. Similar to git log base.. (:sha context)"
+  "Returns a lazy sequence of commits from :sha of context to base. Similar to git log base.. (:sha context)
+
+  If base is nil, will return all commits since all time.
+  "
   [context base]
   (->> (paginate context (list-commits context))
        (map #(-> % :body))
