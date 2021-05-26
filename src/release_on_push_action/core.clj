@@ -105,7 +105,7 @@
                                         (str/join "\n"))]
     {:tag_name         (str (:input/tag-prefix context) next-version)
      :target_commitish (:sha context)
-     :name             next-version
+     :name             (str (:input/tag-prefix context) next-version)
      :body             (with-out-str
                          (printf "Version %s\n\n" next-version)
                          (when-let [body (:input/release-body context)]
