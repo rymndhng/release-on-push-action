@@ -18,6 +18,8 @@ outputs:
     description: 'Tag of released version'
   version:
     description: 'Version of release'
+  body:
+    description: 'Github Release Body in Text'
 runs:
   using: 'docker'
   image: 'Dockerfile'
