@@ -124,14 +124,26 @@
                {:body    file
                 :headers {"Authorization" (str "token " (:token context))}})))
 
+(defn set-output-escape
+  "Escapes text for the set-output command in Github Actions.
+
+  See https://github.community/t/set-output-truncates-multiline-strings/16852
+  "
+  [text]
+  (-> text
+      (clojure.string/replace #"%" "%25")
+      (clojure.string/replace #"\n" "%0A")
+      (clojure.string/replace #"\r" "%0D")))
+
 (defn set-output-parameters!
   "Sets output parameters for additional tasks to consume.
 
   See https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
   "
   [release-data]
-  (printf "::set-output name=tag_name::%s\n" (:tag_name release-data))
-  (printf "::set-output name=version::%s\n" (:name release-data)))
+  (printf "::set-output name=tag_name::%s\n" (set-output-escape (:tag_name release-data)))
+  (printf "::set-output name=version::%s\n" (set-output-escape (:name release-data)))
+  (printf "::set-output name=body::%s\n" (set-output-escape (:body release-data))))
 
 (defn -main [& args]
   (let [_            (println "Starting process...")

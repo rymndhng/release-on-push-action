@@ -41,6 +41,7 @@ jobs:
         run: |
           echo "Got tag version ${{ steps.integration-tests.outputs.tag_name }}"
           echo "Got version ${{ steps.integration-tests.outputs.version }}"
+          echo "Got body ${{ steps.integration-tests.outputs.body }}"
 
       - name: Container Builds
         run: docker build . -t rymndhng/release-on-push-action
