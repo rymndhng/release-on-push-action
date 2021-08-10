@@ -88,10 +88,9 @@
     (contains? (get-labels (get-in related-data [:related-prs])) "norelease")
     "Skipping release. Reason: related PR has label norelease"))
 
-;; Note: at 500, I suspect this list will be unproductive to view
 (def max-commits-to-summarize
   "This is the maximum number of commits to summarize."
-  500)
+  50)
 
 (defn generate-new-release-data [context related-data]
   (let [bump-version-scheme (bump-version-scheme context related-data)
