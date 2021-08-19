@@ -16,7 +16,7 @@ inputs:
   max_commits:
     description: "Maximum number of commits to add to release body"
     required: false
-    default: 500
+    default: 5
 outputs:
   tag_name:
     description: 'Tag of released version'
