@@ -155,6 +155,27 @@ jobs:
           tag_prefix: ""
 ```
 
+### How can I configure the maximum number of commits to summarize?
+
+Use the option `max_commits`. The default value is 50.
+
+``` yaml
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release-on-push:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: rymndhng/release-on-push-action@master
+        with:
+          max_commits: 100
+```
+
 ## Development
 
 Uses [babashka](https://github.com/borkdude/babashka).
