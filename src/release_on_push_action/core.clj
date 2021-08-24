@@ -32,6 +32,7 @@
   {:token               (getenv-or-throw "GITHUB_TOKEN")
    :repo                (getenv-or-throw "GITHUB_REPOSITORY")
    :sha                 (getenv-or-throw "GITHUB_SHA")
+   :input/max-commits   (Integer/parseInt (getenv-or-throw "INPUT_MAX_COMMITS"))
    :input/release-body  (System/getenv "INPUT_RELEASE_BODY")
    :input/tag-prefix    (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
    :bump-version-scheme (assert-valid-bump-version-scheme
@@ -88,10 +89,6 @@
     (contains? (get-labels (get-in related-data [:related-prs])) "norelease")
     "Skipping release. Reason: related PR has label norelease"))
 
-(def max-commits-to-summarize
-  "This is the maximum number of commits to summarize."
-  50)
-
 (defn generate-new-release-data [context related-data]
   (let [bump-version-scheme (bump-version-scheme context related-data)
         current-version     (get-tagged-version (:latest-release related-data))
@@ -99,7 +96,7 @@
         base-commit         (get-in related-data [:latest-release :target_commitish])
 
         summary-since-last-release (->> (github/list-commits-to-base context base-commit)
-                                        (take max-commits-to-summarize)
+                                        (take (:input/max-commits context))
                                         (map github/commit-summary)
                                         (str/join "\n"))]
     {:tag_name         (str (:input/tag-prefix context) next-version)

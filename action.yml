@@ -13,6 +13,10 @@ inputs:
     description: "Prefix to append to git tags. To unset this, set version_prefix to an empty string."
     required: false
     default: 'v'
+  max_commits:
+    description: "Maximum number of commits to add to release body"
+    required: false
+    default: 50
 outputs:
   tag_name:
     description: 'Tag of released version'
