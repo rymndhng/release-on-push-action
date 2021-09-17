@@ -57,7 +57,7 @@
   (try
     (parse-response
      (curl/get
-      (format "%s/%s/releases/latest" (:github/api-url context) (:repo context))
+      (format "%s/repos/%s/releases/latest" (:github/api-url context) (:repo context))
       {:headers {"Authorization" (str "token " (:token context))}}))
     (catch clojure.lang.ExceptionInfo ex
       (cond
