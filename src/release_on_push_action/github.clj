@@ -44,7 +44,7 @@
   "See https://developer.github.com/v3/pulls/#list-pull-requests"
   [context]
   (parse-response
-   (curl/get "https://api.github.com/search/issues"
+   (curl/get (format "%s/search/issues" (:github/api-url context))
              {:headers      {"Authorization" (str "token " (:token context))}
               :query-params {"q" (format "repo:%s type:pr is:closed is:merged SHA:%s" (:repo context) (:sha context))}})))
 
@@ -57,7 +57,7 @@
   (try
     (parse-response
      (curl/get
-      (format "https://api.github.com/repos/%s/releases/latest" (:repo context))
+      (format "%s/%s/releases/latest" (:github/api-url context) (:repo context))
       {:headers {"Authorization" (str "token " (:token context))}}))
     (catch clojure.lang.ExceptionInfo ex
       (cond
@@ -72,7 +72,7 @@
   "See https://developer.github.com/v3/repos/commits/"
   [context]
   (parse-response
-   (curl/get (format "https://api.github.com/repos/%s/commits/%s" (:repo context) (:sha context))
+   (curl/get (format "%s/repos/%s/commits/%s" (:github/api-url context) (:repo context) (:sha context))
              {:headers {"Authorization" (str "token " (:token context))}})))
 
 (defn list-commits
@@ -81,7 +81,7 @@
   See https://developer.github.com/v3/repos/commits/"
   [context]
   (parse-response
-   (curl/get (format "https://api.github.com/repos/%s/commits" (:repo context))
+   (curl/get (format "%s/repos/%s/commits" (:github/api-url context) (:repo context))
              {:headers      {"Authorization" (str "token " (:token context))}
               :query-params {"sha" (:sha context)}})))
 
@@ -108,6 +108,7 @@
 (comment
   ;; used for testing
   (def context {:repo "rymndhng/release-on-push-action"
+                :github/api-url "https://api.github.com"
                 :sha "167c690247d0933acde636d72352bcd67e33724b"})
 
   ;; this should match
