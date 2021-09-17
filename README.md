@@ -187,10 +187,6 @@ To run tests:
 
 ``` sh
 make test
-
-# run integration tests
-source local-test.env
-make integration-tests
 ```
 
 
