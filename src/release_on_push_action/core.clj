@@ -27,11 +27,15 @@
   bump-version-scheme)
 
 (defn context-from-env
-  "Creates a context from environment variables and arguments to the main function."
+  "Creates a context from environment variables and arguments to the main function.
+
+  See https://docs.github.com/en/actions/reference/environment-variables.
+  "
   [args]
   {:token               (getenv-or-throw "GITHUB_TOKEN")
    :repo                (getenv-or-throw "GITHUB_REPOSITORY")
    :sha                 (getenv-or-throw "GITHUB_SHA")
+   :github/api-url      (getenv-or-throw "GITHUB_API_URL")
    :input/max-commits   (Integer/parseInt (getenv-or-throw "INPUT_MAX_COMMITS"))
    :input/release-body  (System/getenv "INPUT_RELEASE_BODY")
    :input/tag-prefix    (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
@@ -116,7 +120,7 @@
   (let [file (java.io.File/createTempFile "release" ".json")]
     (.deleteOnExit file)
     (json/encode-stream new-release-data (clojure.java.io/writer file))
-    (curl/post (format "https://api.github.com/repos/%s/releases" (:repo context))
+    (curl/post (format "%s/repos/%s/releases" (:github/api-url context) (:repo context))
                {:body    file
                 :headers {"Authorization" (str "token " (:token context))}})))
 
