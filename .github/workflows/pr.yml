@@ -28,9 +28,8 @@ jobs:
       - name: Unit Tests
         run: make test
 
-      - name: Integration Tests
-        id: integration-tests
-        run: make integration-test
+      - name: Dry Run
+        run: make dryrun
         env:
           BABASHKA_CLASSPATH: src
           INPUT_BUMP_VERSION_SCHEME: minor
