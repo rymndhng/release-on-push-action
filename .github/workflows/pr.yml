@@ -27,6 +27,8 @@ jobs:
 
       - name: Unit Tests
         run: make test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Dry Run
         run: make dryrun

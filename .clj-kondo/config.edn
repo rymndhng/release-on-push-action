@@ -1,0 +1,1 @@
+{:lint-as {release-on-push-action.core-test/def-fixture clojure.core/def}}
