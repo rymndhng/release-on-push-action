@@ -122,7 +122,7 @@
     (json/encode-stream new-release-data (clojure.java.io/writer file))
     (curl/post (format "%s/repos/%s/releases" (:github/api-url context) (:repo context))
                {:body    file
-                :headers {"Authorization" (str "token " (:token context))}})))
+                :headers (github/headers context)})))
 
 (defn set-output-escape
   "Escapes text for the set-output command in Github Actions.

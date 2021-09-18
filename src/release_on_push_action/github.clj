@@ -24,11 +24,13 @@
       (with-links)
       (update :body json/parse-string true)))
 
+(defn headers [context]
+  {"Authorization" (str "token " (:token context))})
+
 ;; -- Pagination helpers using token  ------------------------------------------
 (defn follow-link [context link]
   (parse-response
-   (curl/get link
-             {:headers {"Authorization" (str "token " (:token context))}})))
+   (curl/get link {:headers (headers context)})))
 
 (defn paginate
   "Paginate a resopnse with a context object"
@@ -45,7 +47,7 @@
   [context]
   (parse-response
    (curl/get (format "%s/search/issues" (:github/api-url context))
-             {:headers      {"Authorization" (str "token " (:token context))}
+             {:headers      (headers context)
               :query-params {"q" (format "repo:%s type:pr is:closed is:merged SHA:%s" (:repo context) (:sha context))}})))
 
 ;; -- Github Releases API  -----------------------------------------------------
@@ -58,7 +60,7 @@
     (parse-response
      (curl/get
       (format "%s/repos/%s/releases/latest" (:github/api-url context) (:repo context))
-      {:headers {"Authorization" (str "token " (:token context))}}))
+      {:headers (headers context)}))
     (catch clojure.lang.ExceptionInfo ex
       (cond
         ;; No previous release created, return nil
@@ -73,7 +75,7 @@
   [context]
   (parse-response
    (curl/get (format "%s/repos/%s/commits/%s" (:github/api-url context) (:repo context) (:sha context))
-             {:headers {"Authorization" (str "token " (:token context))}})))
+             {:headers (headers context)})))
 
 (defn list-commits
   "Gets all commits between two commit shas.
@@ -82,7 +84,7 @@
   [context]
   (parse-response
    (curl/get (format "%s/repos/%s/commits" (:github/api-url context) (:repo context))
-             {:headers      {"Authorization" (str "token " (:token context))}
+             {:headers      (headers context)
               :query-params {"sha" (:sha context)}})))
 
 (defn list-commits-to-base
