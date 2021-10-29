@@ -48,6 +48,7 @@
    :input/max-commits   5
    :input/release-body  ""
    :input/tag-prefix    ""
+   :input/use-github-release-notes false
    :bump-version-scheme "minor"
    :dry-run             true})
 
@@ -211,3 +212,12 @@ Hello World
           11  "- [74ffa7bf] Commit 7"
           100 "- [74ffa7bf] Commit 7" ;larger number than what's available
           )))))
+
+(deftest ^:integration generate-new-release-data-with-github-generated-release-notes
+  (let [[ctx related-data] @fixture-project-with-release
+        ctx                (assoc ctx :input/use-github-release-notes true)
+        release-data       (sut/generate-new-release-data ctx related-data)]
+
+    (testing "sets options to enable Github Generated Release Notes"
+      (is (= true (:generate_release_notes release-data)))
+      (is (= "Version 0.2.0\n\n" (:body release-data))))))

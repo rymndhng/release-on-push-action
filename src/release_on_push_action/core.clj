@@ -39,6 +39,7 @@
    :input/max-commits   (Integer/parseInt (getenv-or-throw "INPUT_MAX_COMMITS"))
    :input/release-body  (System/getenv "INPUT_RELEASE_BODY")
    :input/tag-prefix    (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
+   :input/use-github-release-notes (Boolean/parseBoolean (System/getenv "INPUT_USE_GITHUB_RELEASE_NOTES"))
    :bump-version-scheme (assert-valid-bump-version-scheme
                          (try
                            (getenv-or-throw "INPUT_BUMP_VERSION_SCHEME")
@@ -99,21 +100,29 @@
         next-version        (semver-bump current-version bump-version-scheme)
         base-commit         (get-in related-data [:latest-release :target_commitish])
 
-        summary-since-last-release (->> (github/list-commits-to-base context base-commit)
+        ;; this is a lazy sequence
+        commits-since-last-release (->> (github/list-commits-to-base context base-commit)
                                         (take (:input/max-commits context))
-                                        (map github/commit-summary)
-                                        (str/join "\n"))]
-    {:tag_name         (str (:input/tag-prefix context) next-version)
-     :target_commitish (:sha context)
-     :name             (str (:input/tag-prefix context) next-version)
-     :body             (with-out-str
-                         (printf "Version %s\n\n" next-version)
-                         (when-let [body (:input/release-body context)]
-                           (println body))
-                         (printf "### Commits\n\n")
-                         (println summary-since-last-release))
-     :draft            false
-     :prerelease       false}))
+                                        (map github/commit-summary))
+
+        body (with-out-str
+               (printf "Version %s\n\n" next-version)
+               (when-let [body (:input/release-body context)]
+                 (println body))
+
+               ;; Do not include our custom commit summary if using Github Release Notes
+               (when-not (:input/use-github-release-notes context)
+                 (printf "### Commits\n\n")
+                 (doseq [commit commits-since-last-release]
+                   (println commit))))]
+
+    {:tag_name               (str (:input/tag-prefix context) next-version)
+     :target_commitish       (:sha context)
+     :name                   (str (:input/tag-prefix context) next-version)
+     :body                   body
+     :draft                  false
+     :prerelease             false
+     :generate_release_notes (:input/use-github-release-notes context)}))
 
 (defn create-new-release! [context new-release-data]
   ;; Use a file because the release data may be too large for an inline curl arg
