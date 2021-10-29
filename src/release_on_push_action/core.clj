@@ -107,8 +107,9 @@
 
         body (with-out-str
                (printf "Version %s\n\n" next-version)
-               (when-let [body (:input/release-body context)]
-                 (println body))
+               (when-let [body (not-empty (:input/release-body context))]
+                 (println body)
+                 (println))
 
                ;; Do not include our custom commit summary if using Github Release Notes
                (when-not (:input/use-github-release-notes context)
