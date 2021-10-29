@@ -17,6 +17,10 @@ inputs:
     description: "Maximum number of commits to add to release body"
     required: false
     default: 50
+  use_github_release_notes:
+    description: "When set to 'true', uses Github's Generated Release Notes instead of this plugin's release notes"
+    required: false
+    default: "false"
 outputs:
   tag_name:
     description: 'Tag of released version'
