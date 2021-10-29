@@ -85,7 +85,6 @@
           :tag_name "0.1.0"
           :body     "Version 0.1.0
 
-
 ### Commits
 
 - [946550e6] Commit 10
@@ -126,7 +125,7 @@ Hello World
 - [74ffa7bf] Commit 7
 - [536a71ab] Commit 6
 "
-               (-> (assoc ctx :input/release-body "Hello World\n")
+               (-> (assoc ctx :input/release-body "Hello World")
                    (sut/generate-new-release-data related-data)
                    (get :body)))))
 
@@ -157,7 +156,6 @@ Hello World
 
           ;; note that commit 6 is not included here
           :body "Version 0.2.0
-
 
 ### Commits
 
@@ -197,7 +195,7 @@ Hello World
 - [2af2e1d6] Commit 8
 - [74ffa7bf] Commit 7
 "
-               (-> (assoc ctx :input/release-body "Hello World\n")
+               (-> (assoc ctx :input/release-body "Hello World")
                    (sut/generate-new-release-data related-data)
                    (get :body)))))
       (testing ":input/max-commits"
