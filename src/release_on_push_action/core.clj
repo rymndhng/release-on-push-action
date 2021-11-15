@@ -52,9 +52,12 @@
 
 ;; -- Version Bumping Logic  ---------------------------------------------------
 (defn fetch-related-data [context]
-  {:related-prs    (:body (github/fetch-related-prs context))
-   :commit         (:body (github/fetch-commit context))
-   :latest-release (:body (github/fetch-latest-release context))})
+  (let [latest-release (:body (github/fetch-latest-release context))]
+    {:related-prs           (:body (github/fetch-related-prs context))
+     :commit                (:body (github/fetch-commit context))
+     :latest-release        latest-release
+     :latest-release-commit (when-let [tag (:tag_name latest-release)]
+                              (:body (github/fetch-commit (assoc context :sha tag))))}))
 
 (defn get-labels [related-prs]
   (->> related-prs :items (map :labels) flatten (map :name) set))
@@ -98,7 +101,7 @@
   (let [bump-version-scheme (bump-version-scheme context related-data)
         current-version     (get-tagged-version (:latest-release related-data))
         next-version        (semver-bump current-version bump-version-scheme)
-        base-commit         (get-in related-data [:latest-release :target_commitish])
+        base-commit         (get-in related-data [:latest-release-commit :sha])
 
         ;; this is a lazy sequence
         commits-since-last-release (->> (github/list-commits-to-base context base-commit)
