@@ -184,6 +184,29 @@ jobs:
           tag_prefix: ""
 ```
 
+### Can I change the prefix `v` from the Git Release?
+
+Yes, you can customize this by changing the `release_prefix`. Here's an example of
+removing the prefix from the release name by using an empty string but still leaving the prefix for the tag name.
+ 
+``` yaml
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release-on-push:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: rymndhng/release-on-push-action@master
+        with:
+          tag_prefix: "v"
+          release_prefix: ""
+```
+
 ### How can I configure the maximum number of commits to summarize?
 
 Use the option `max_commits`. The default value is 50.

@@ -39,6 +39,7 @@
    :input/max-commits   (Integer/parseInt (getenv-or-throw "INPUT_MAX_COMMITS"))
    :input/release-body  (System/getenv "INPUT_RELEASE_BODY")
    :input/tag-prefix    (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
+   :input/release-prefix (System/getenv "INPUT_RELEASE_PREFIX") ;defaults to "v", see default in action.yml
    :input/use-github-release-notes (Boolean/parseBoolean (System/getenv "INPUT_USE_GITHUB_RELEASE_NOTES"))
    :bump-version-scheme (assert-valid-bump-version-scheme
                          (try
@@ -122,7 +123,7 @@
 
     {:tag_name               (str (:input/tag-prefix context) next-version)
      :target_commitish       (:sha context)
-     :name                   (str (:input/tag-prefix context) next-version)
+     :name                   (str (:input/release-prefix context) next-version)
      :body                   body
      :draft                  false
      :prerelease             false
