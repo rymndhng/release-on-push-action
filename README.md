@@ -184,11 +184,15 @@ jobs:
           tag_prefix: ""
 ```
 
-### Can I change the prefix `v` from the Git Release?
+### Can I change the name of the Release?
 
-Yes, you can customize this by changing the `release_prefix`. Here's an example of
-removing the prefix from the release name by using an empty string but still leaving the prefix for the tag name.
- 
+Yes, you can customize this by changing the `release_name`. The `release_name` supports these template variables:
+
+- `<RELEASE_VERSION>` contains the version number, i.e. `1.2.3`
+- `<RELEASE_TAG>` contains the git tag name, i.e. `v1.2.3`
+
+See example below for how to create a release with the name `Release 1.2.3`
+
 ``` yaml
 on:
   push:
@@ -204,7 +208,7 @@ jobs:
       - uses: rymndhng/release-on-push-action@master
         with:
           tag_prefix: "v"
-          release_prefix: ""
+          release_name: "Release <RELEASE_VERSION>"
 ```
 
 ### How can I configure the maximum number of commits to summarize?
