@@ -37,6 +37,7 @@ jobs:
           INPUT_BUMP_VERSION_SCHEME: minor
           INPUT_MAX_COMMITS: 5
           INPUT_TAG_PREFIX: v
+          INPUT_RELEASE_NAME: <RELEASE_TAG>
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check Output Parameters
@@ -54,6 +55,7 @@ jobs:
           INPUT_BUMP_VERSION_SCHEME: minor
           INPUT_MAX_COMMITS: 5
           INPUT_TAG_PREFIX: v
+          INPUT_RELEASE_NAME: <RELEASE_TAG>
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Disable me if needed to debug curl/post action
