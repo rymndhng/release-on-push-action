@@ -49,6 +49,7 @@
    :input/release-body  ""
    :input/tag-prefix    ""
    :input/use-github-release-notes false
+   :input/release-name  "<RELEASE_TAG>"
    :bump-version-scheme "minor"
    :dry-run             true})
 
@@ -111,6 +112,17 @@
           "minor" "v0.1.0"
           "patch" "v0.0.1")))
 
+    (testing "release_name"
+      (are [template expected] (= expected (-> (assoc ctx
+                                                      :input/tag-prefix "v"
+                                                      :input/release-name template)
+                                               (sut/generate-new-release-data related-data)
+                                               (get :name)))
+        "<RELEASE_TAG>"                           "v0.1.0"
+        "<RELEASE_VERSION>"                       "0.1.0"
+        "Release <RELEASE_VERSION>"               "Release 0.1.0"
+        "Release <RELEASE_TAG> <RELEASE_VERSION>" "Release v0.1.0 0.1.0"))
+
     (testing "body"
       (testing ":input/release-body"
         (is (= "Version 0.1.0
@@ -139,7 +151,7 @@ Hello World
           5   "- [536a71ab] Commit 6"
           10  "- [8c0eef57] Commit 1"
           11  "- [2db43d3a] Initial commit"
-          100 "- [2db43d3a] Initial commit"     ;larger number than what's available
+          100 "- [2db43d3a] Initial commit" ;larger number than what's available
           )))))
 
 (deftest ^:integration generate-new-release-data-from-existing-release

@@ -13,6 +13,14 @@ inputs:
     description: "Prefix to append to git tags. To unset this, set version_prefix to an empty string."
     required: false
     default: 'v'
+  release_name:
+    description: |
+      Name of the release. Supports these template variables:
+
+        <RELEASE_VERSION> the version number, e.g. "1.2.3"
+        <RELEASE_TAG>     the git tag name, e.g. "v1.2.3"
+    required: true
+    default: '<RELEASE_TAG>'
   max_commits:
     description: "Maximum number of commits to add to release body"
     required: false
