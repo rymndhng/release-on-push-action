@@ -50,6 +50,8 @@ Allowed values of `bump_version_scheme`:
 
 For stability, we recommend pinning the version of the action. See [Releases](https://github.com/rymndhng/release-on-push-action/releases).
 
+See [action.yml](./action.yml) for the full list of options.
+
 ## FAQ
 
 ### Can I skip creation of a release?
