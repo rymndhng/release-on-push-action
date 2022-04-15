@@ -49,7 +49,8 @@
                              (if (input-strategy-set?)
                                (getenv-or-throw "INPUT_STRATEGY")
                                (throw ex)))))
-   :dry-run             (contains? (set args) "--dry-run")})
+   :dry-run             (or (Boolean/parseBoolean (System/getenv "INPUT_DRY_RUN"))
+                            (contains? (set args) "--dry-run"))})
 
 ;; -- Version Bumping Logic  ---------------------------------------------------
 (defn fetch-related-data [context]

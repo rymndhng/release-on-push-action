@@ -29,6 +29,10 @@ inputs:
     description: "When set to 'true', uses Github's Generated Release Notes instead of this plugin's release notes"
     required: false
     default: "false"
+  dry_run:
+    description: "When set to 'true', will compute the next tag, but will not create a release."
+    required: false
+    default: "false"
 outputs:
   tag_name:
     description: 'Tag of released version'
