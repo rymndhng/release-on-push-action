@@ -72,7 +72,8 @@ Only one of these labels should be present on a PR. If there are multiple, the b
 
 ### Do I need to setup Github Action access tokens or any other permission-related thing?
 
-No, you do not! Github Actions will inject a token for this plugin to interact with the API. 
+Github Actions will inject a token for this plugin to interact with the API.
+You need to enable `read and write permission` to this token under `settings > actions > general > workflow permissions` (disabled by default).
 
 ### Can I create a tag instead of a release?
 
