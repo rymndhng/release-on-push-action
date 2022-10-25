@@ -13,12 +13,12 @@
     "1.0.0" "foo1-1.0.0"
     "1.0.0" "111-1.0.0"))
 
-(deftest set-output-escape
-  (are [expected input] (= expected (sut/set-output-escape input))
-    "hello world"     "hello world"
-    "hello%2520world" "hello%20world"
-    "hello%0Aworld"   "hello\nworld"
-    "hello%0Dworld"   "hello\rworld"))
+(deftest prepare-key-value
+  (are [expected input] (= expected (sut/prepare-key-value "foo" input "EOF"))
+    "foo<<EOF\nhello world\nEOF"   "hello world"
+    "foo<<EOF\nhello%20world\nEOF" "hello%20world"
+    "foo<<EOF\nhello\nworld\nEOF"  "hello\nworld"
+    "foo<<EOF\nhello\rworld\nEOF"  "hello\rworld"))
 
 (deftest semver-bump
   (testing "patch bump"
