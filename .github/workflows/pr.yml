@@ -33,8 +33,8 @@ jobs:
 
       - name: Dry Run
         run: make dryrun
+        id: integration-tests
         env:
-          BABASHKA_CLASSPATH: src
           INPUT_BUMP_VERSION_SCHEME: minor
           INPUT_MAX_COMMITS: 5
           INPUT_TAG_PREFIX: v

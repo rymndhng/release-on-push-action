@@ -7,4 +7,4 @@ test:
 	bb --classpath "src:test" run_tests.clj
 
 dryrun:
-	bb --verbose --main release-on-push-action.core --dry-run
+	bb --verbose --classpath "src" --main release-on-push-action.core --dry-run
