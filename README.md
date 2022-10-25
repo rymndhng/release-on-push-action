@@ -237,15 +237,31 @@ jobs:
 
 ## Development
 
-Uses [babashka](https://github.com/borkdude/babashka).
+Uses [babashka](https://github.com/borkdude/babashka)
 
 To run tests:
 
-1. Install babashka ([link](https://github.com/borkdude/babashka#installation)).
+1. Install [babashka](https://github.com/borkdude/babashka#installation).
+2. Install [direnv](https://direnv.net/docs/installation.html)
+3. Create a `.envrc` file at the project root from this template:
+
+``` sh
+export GITHUB_TOKEN=<YOUR_TOKEN>
+export GITHUB_REPOSITORY=rymndhng/release-on-push-action
+export GITHUB_SHA=167c690247d0933acde636d72352bcd67e33724b
+export GITHUB_API_URL=https://api.github.com
+export INPUT_BUMP_VERSION_SCHEME=minor
+export INPUT_MAX_COMMITS=5
+export INPUT_TAG_PREFIX=v
+export INPUT_RELEASE_NAME="<RELEASE_TAG>"
+export INPUT_DRY_RUN=1
+```
+
 2. Run Tests
 
 ``` sh
 make test
+make dryrun
 ```
 
 
