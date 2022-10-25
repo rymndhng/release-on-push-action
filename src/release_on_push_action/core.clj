@@ -2,8 +2,7 @@
   (:require [babashka.curl :as curl]
             [cheshire.core :as json]
             [clojure.string :as str]
-            [clojure.java.io]
-
+            [clojure.java.io :as io]
             [release-on-push-action.github :as github]))
 
 ;; -- Configuration Parsing  ---------------------------------------------------
@@ -36,6 +35,7 @@
    :repo                (getenv-or-throw "GITHUB_REPOSITORY")
    :sha                 (getenv-or-throw "GITHUB_SHA")
    :github/api-url      (getenv-or-throw "GITHUB_API_URL")
+   :github/output       (System/getenv "GITHUB_OUTPUT")
    :input/max-commits   (Integer/parseInt (getenv-or-throw "INPUT_MAX_COMMITS"))
    :input/release-body  (System/getenv "INPUT_RELEASE_BODY")
    :input/tag-prefix    (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
@@ -136,31 +136,39 @@
   ;; Use a file because the release data may be too large for an inline curl arg
   (let [file (java.io.File/createTempFile "release" ".json")]
     (.deleteOnExit file)
-    (json/encode-stream new-release-data (clojure.java.io/writer file))
+    (json/encode-stream new-release-data (io/writer file))
     (curl/post (format "%s/repos/%s/releases" (:github/api-url context) (:repo context))
                {:body    file
                 :headers (github/headers context)})))
 
-(defn set-output-escape
+(def EOL (System/getProperty "line.separator"))
+
+(defn prepare-key-value
   "Escapes text for the set-output command in Github Actions.
 
   See https://github.community/t/set-output-truncates-multiline-strings/16852
+  and https://github.com/actions/toolkit/blob/ffb7e3e14ed5e28ae00e9c49ba02b2764d57a6b7/packages/core/src/file-command.ts#L28
   "
-  [text]
-  (-> text
-      (clojure.string/replace #"%" "%25")
-      (clojure.string/replace #"\n" "%0A")
-      (clojure.string/replace #"\r" "%0D")))
+  ([key value]
+   (prepare-key-value key value (format "delimiter_%s" (random-uuid))))
+  ([key value delimiter]
+   (str/join "" [key "<<" delimiter EOL value EOL delimiter])))
 
 (defn set-output-parameters!
   "Sets output parameters for additional tasks to consume.
 
   See https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
   "
-  [release-data]
-  (printf "::set-output name=tag_name::%s\n" (set-output-escape (:tag_name release-data)))
-  (printf "::set-output name=version::%s\n" (set-output-escape (:name release-data)))
-  (printf "::set-output name=body::%s\n" (set-output-escape (:body release-data))))
+  [context release-data]
+  (let [out (if-let [output (not-empty (:github/output context))]
+              (-> output io/file io/writer)
+              (do
+                (println "[set-output-parmaeters] simulated writing to file:")
+                *out*))]
+    (binding [*out* out]
+      (println (prepare-key-value "tag_name" (:tag_name release-data)))
+      (println (prepare-key-value "version" (:name release-data)))
+      (println (prepare-key-value "body" (:body release-data))))))
 
 (defn -main [& args]
   (let [_            (println "Starting process...")
@@ -182,4 +190,4 @@
         (do
           (println "Executing Release\n" (json/generate-string release-data {:pretty true}))
           (println (create-new-release! context release-data))))
-      (set-output-parameters! release-data))))
+      (set-output-parameters! context release-data))))
