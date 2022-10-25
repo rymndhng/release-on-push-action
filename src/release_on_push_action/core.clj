@@ -62,7 +62,7 @@
                               (:body (github/fetch-commit (assoc context :sha tag))))}))
 
 (defn get-labels [related-prs]
-  (->> related-prs :items (map :labels) flatten (map :name) set))
+  (->> related-prs (map :labels) flatten (map :name) set))
 
 (defn bump-version-scheme [context related-data]
   (let [labels (get-labels (:related-prs related-data))]

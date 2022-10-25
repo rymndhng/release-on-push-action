@@ -76,7 +76,7 @@
 (deftest ^:integration generate-new-release-data-from-new-project
   (let [[ctx related-data] @fixture-project-without-release]
     (testing "preconditions"
-      (is (= 0 (get-in related-data [:related-prs :total_count])))
+      (is (= 0 (count (get-in related-data [:related-prs]))))
       (is (= "Commit 10" (get-in related-data [:commit :commit :message])))
       (is (nil? (:latest-release related-data)) "has no latest release"))
 
@@ -157,7 +157,7 @@ Hello World
 (deftest ^:integration generate-new-release-data-from-existing-release
   (let [[ctx related-data] @fixture-project-with-release]
     (testing "preconditions"
-      (is (= 0 (get-in related-data [:related-prs :total_count])))
+      (is (= 0 (count (get-in related-data [:related-prs]))))
       (is (= "Commit 10" (get-in related-data [:commit :commit :message])))
       (is (= "v0.1.0" (get-in related-data [:latest-release :tag_name])) "has release v0.1.0"))
 
