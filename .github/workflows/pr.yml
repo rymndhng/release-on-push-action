@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install babashka
-        run: sudo ./bin/install_babashka.sh --version 0.6.1
+        run: sudo ./bin/install_babashka.sh --version 1.0.164
 
       - name: Unit Tests
         run: make test
