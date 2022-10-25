@@ -43,12 +43,14 @@
 
 ;; -- Github PRs API  ----------------------------------------------------------
 (defn fetch-related-prs
-  "See https://developer.github.com/v3/pulls/#list-pull-requests"
+  "See https://docs.github.com/en/rest/commits/commits#list-pull-requests-associated-with-a-commit"
   [context]
   (parse-response
-   (curl/get (format "%s/search/issues" (:github/api-url context))
-             {:headers      (headers context)
-              :query-params {"q" (format "repo:%s type:pr is:closed is:merged SHA:%s" (:repo context) (:sha context))}})))
+   (curl/get (format "%s/repos/%s/commits/%s/pulls"
+                     (:github/api-url context)
+                     (:repo context)
+                     (:sha context))
+             {:headers (headers context)})))
 
 ;; -- Github Releases API  -----------------------------------------------------
 (defn fetch-latest-release
