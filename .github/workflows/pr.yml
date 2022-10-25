@@ -3,28 +3,20 @@ on:
   - pull_request
 
 jobs:
-  lint:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - uses: DeLaGuardo/setup-clj-kondo@master
+      - uses: DeLaGuardo/setup-clojure@9.5
         with:
-          version: '2022.10.14'
+          clj-kondo: '2022.10.14'
+          bb: 1.0.164
 
-      - name: Run clj-kondo
+      - name: clj-kondo
         run: |
           clj-kondo --lint src --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Install babashka
-        run: sudo ./bin/install_babashka.sh --version 1.0.164
 
       - name: Unit Tests
         run: make test
