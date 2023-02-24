@@ -33,6 +33,10 @@ inputs:
     description: "When set to 'true', will compute the next tag, but will not create a release."
     required: false
     default: "false"
+  prerelease_tag:
+    description: "The tag to use for prerelease versions. For example a tag of 'pre': 1.0.0-pre.1."
+    required: false
+    default: "pre"
 outputs:
   tag_name:
     description: 'Tag of released version'

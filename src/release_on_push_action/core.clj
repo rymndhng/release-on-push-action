@@ -41,6 +41,7 @@
    :input/tag-prefix    (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
    :input/release-name  (System/getenv "INPUT_RELEASE_NAME") ;defaults to "<RELEASE_TAG>", see default in action.yml
    :input/use-github-release-notes (Boolean/parseBoolean (System/getenv "INPUT_USE_GITHUB_RELEASE_NOTES"))
+   :input/prerelease-tag (System/getenv "INPUT_PRERELEASE_TAG")
    :bump-version-scheme (assert-valid-bump-version-scheme
                          (try
                            (getenv-or-throw "INPUT_BUMP_VERSION_SCHEME")
@@ -72,6 +73,10 @@
       (contains? labels "release:patch") :patch
       :else (keyword (:bump-version-scheme context)))))
 
+(defn is-prerelease? [context related-data]
+  (let [labels (get-labels (:related-prs related-data))]
+    (contains? labels "prerelease")))
+
 (defn get-tagged-version [latest-release]
   (let [tag      (get latest-release :tag_name "0.0.0")
         [prefix] (str/split tag #"\d+\.\d+\.\d+")] ;this strips any leading characters before the semver string
@@ -90,6 +95,17 @@
                        :norelease [major minor patch])]
     (str (str/join "." next-version) (if prerelease-version (str "-" prerelease-version)))))
 
+(defn prerelease-bump [version prerelease-tag]
+  (let [[main-version prerelease-version] (str/split version #"-")
+        [prerelease-prefix prerelease-number] (if (nil? prerelease-version)
+                                                [nil nil]
+                                                (str/split prerelease-version #"\."))
+        next-prerelease (cond
+                          (nil? prerelease-prefix) prerelease-tag
+                          (nil? prerelease-number) (str prerelease-tag ".1")
+                          :else (str prerelease-prefix "." (safe-inc (Integer/parseInt prerelease-number))))]
+    (str main-version "-" next-prerelease)))
+
 (defn norelease-reason [context related-data]
   (cond
     (= :norelease (bump-version-scheme context related-data))
@@ -105,8 +121,11 @@
   (let [bump-version-scheme (bump-version-scheme context related-data)
         current-version     (get-tagged-version (:latest-release related-data))
         next-version        (semver-bump current-version bump-version-scheme)
+        final-version       (if (is-prerelease? context related-data)
+                              (prerelease-bump next-version (:input/prerelease-tag context))
+                              next-version)
         base-commit         (get-in related-data [:latest-release-commit :sha])
-        tag-name            (str (:input/tag-prefix context) next-version)
+        tag-name            (str (:input/tag-prefix context) final-version)
 
         ;; this is a lazy sequence
         commits-since-last-release (->> (github/list-commits-to-base context base-commit)
@@ -114,7 +133,7 @@
                                         (map github/commit-summary))
 
         body (with-out-str
-               (printf "Version %s\n\n" next-version)
+               (printf "Version %s\n\n" final-version)
                (when-let [body (not-empty (:input/release-body context))]
                  (println body)
                  (println))
@@ -127,11 +146,11 @@
     {:tag_name               tag-name
      :target_commitish       (:sha context)
      :name                   (-> (:input/release-name context)
-                                 (str/replace "<RELEASE_VERSION>" next-version)
+                                 (str/replace "<RELEASE_VERSION>" final-version)
                                  (str/replace "<RELEASE_TAG>" tag-name))
      :body                   body
      :draft                  false
-     :prerelease             false
+     :prerelease             (is-prerelease? context related-data)
      :generate_release_notes (:input/use-github-release-notes context)}))
 
 (defn create-new-release! [context new-release-data]

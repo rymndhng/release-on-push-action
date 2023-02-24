@@ -20,6 +20,19 @@
     "foo<<EOF\nhello\nworld\nEOF"  "hello\nworld"
     "foo<<EOF\nhello\rworld\nEOF"  "hello\rworld"))
 
+(deftest prerelease-bump
+  (testing "prerelease bump"
+    (are [expected input] (= expected (sut/prerelease-bump input "pre"))
+        "0.0.0-pre" "0.0.0"
+        "0.0.0-pre.1" "0.0.0-pre"
+        "0.0.1-pre" "0.0.1"
+        "0.0.1-pre.1" "0.0.1-pre"
+        "0.1.0-pre" "0.1.0"
+        "0.1.0-pre.1" "0.1.0-pre"
+        "1.1.0-pre" "1.1.0"
+        "1.1.0-pre.1" "1.1.0-pre"
+        "1.1.0-pre.2" "1.1.0-pre.1")))
+
 (deftest semver-bump
   (testing "norelease bump"
     (are [expected input] (= expected (sut/semver-bump input :norelease))
