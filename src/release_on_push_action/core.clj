@@ -71,6 +71,7 @@
       (contains? labels "release:major") :major
       (contains? labels "release:minor") :minor
       (contains? labels "release:patch") :patch
+      (contains? labels "prerelease") :prerelease
       :else (keyword (:bump-version-scheme context)))))
 
 (defn is-prerelease? [context related-data]
@@ -92,7 +93,8 @@
                        :major [(safe-inc major) 0 0]
                        :minor [major (safe-inc minor) 0]
                        :patch [major minor (safe-inc patch)]
-                       :norelease [major minor patch])]
+                       :norelease [major minor patch]
+                       :prerelease [major minor patch])]
     (str (str/join "." next-version) (if prerelease-version (str "-" prerelease-version)))))
 
 (defn prerelease-bump [version prerelease-tag]
@@ -108,6 +110,8 @@
 
 (defn norelease-reason [context related-data]
   (cond
+    (is-prerelease? context related-data) nil
+
     (= :norelease (bump-version-scheme context related-data))
     "Skipping release, no version bump found."
 
