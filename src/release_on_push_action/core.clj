@@ -81,12 +81,14 @@
   (inc (or n 0)))
 
 (defn semver-bump [version bump]
-  (let [[major minor patch] (map #(Integer/parseInt %) (str/split version #"\."))
+  (let [[main-version prerelease-version] (str/split version #"-")
+        [major minor patch] (map #(Integer/parseInt %) (str/split main-version #"\."))
         next-version (condp = bump
                        :major [(safe-inc major) 0 0]
                        :minor [major (safe-inc minor) 0]
-                       :patch [major minor (safe-inc patch)])]
-    (str/join "." next-version)))
+                       :patch [major minor (safe-inc patch)]
+                       :norelease [major minor patch])]
+    (str (str/join "." next-version) (if prerelease-version (str "-" prerelease-version)))))
 
 (defn norelease-reason [context related-data]
   (cond
