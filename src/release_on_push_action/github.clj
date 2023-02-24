@@ -71,6 +71,24 @@
 
         :else (throw ex)))))
 
+(defn fetch-releases
+  "Gets releases. Returns nil when there are no releases.
+
+  See https://developer.github.com/v3/repos/releases/#list-releases"
+  [context]
+  (try
+    (parse-response
+     (curl/get
+      (format "%s/repos/%s/releases" (:github/api-url context) (:repo context))
+      {:headers (headers context)}))
+    (catch clojure.lang.ExceptionInfo ex
+      (cond
+        ;; No previous release created, return nil
+        (= 404 (:status (ex-data ex)))
+        (println "No releases found for project.")
+
+        :else (throw ex)))))
+
 ;; -- Github Commit API  -------------------------------------------------------
 (defn fetch-commit
   "See https://developer.github.com/v3/repos/commits/"
