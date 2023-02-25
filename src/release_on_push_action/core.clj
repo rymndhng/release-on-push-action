@@ -54,16 +54,23 @@
                             (contains? (set args) "--dry-run"))})
 
 ;; -- Version Bumping Logic  ---------------------------------------------------
+(defn get-labels [related-prs]
+  (->> related-prs (map :labels) flatten (map :name) set))
+
+(defn is-prerelease? [context related-data]
+  (let [labels (get-labels (:related-prs related-data))]
+    (contains? labels "prerelease")))
+
 (defn fetch-related-data [context]
-  (let [latest-release (first (:body (github/fetch-releases context)))]
-    {:related-prs           (:body (github/fetch-related-prs context))
+  (let [related-prs (:body (github/fetch-related-prs context))
+        latest-release (if (is-prerelease? context {:related-prs related-prs})
+                         (first (:body (github/fetch-releases context)))
+                         (:body (github/fetch-latest-release context)))]
+    {:related-prs           related-prs
      :commit                (:body (github/fetch-commit context))
      :latest-release        latest-release
      :latest-release-commit (when-let [tag (:tag_name latest-release)]
                               (:body (github/fetch-commit (assoc context :sha tag))))}))
-
-(defn get-labels [related-prs]
-  (->> related-prs (map :labels) flatten (map :name) set))
 
 (defn bump-version-scheme [context related-data]
   (let [labels (get-labels (:related-prs related-data))]
@@ -73,10 +80,6 @@
       (contains? labels "release:patch") :patch
       (contains? labels "prerelease") :prerelease
       :else (keyword (:bump-version-scheme context)))))
-
-(defn is-prerelease? [context related-data]
-  (let [labels (get-labels (:related-prs related-data))]
-    (contains? labels "prerelease")))
 
 (defn get-tagged-version [latest-release]
   (let [tag      (get latest-release :tag_name "0.0.0")
