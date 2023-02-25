@@ -100,7 +100,7 @@
                        :prerelease [major minor patch])]
     (str (str/join "." next-version) (if prerelease-version (str "-" prerelease-version)))))
 
-(defn prerelease-bump [version prerelease-tag]
+(defn prerelease-bump [version prerelease-tag version-changed]
   (let [[main-version prerelease-version] (str/split version #"-")
         [prerelease-prefix prerelease-number] (if (nil? prerelease-version)
                                                 [nil nil]
@@ -109,7 +109,7 @@
                           (nil? prerelease-prefix) prerelease-tag
                           (nil? prerelease-number) (str prerelease-tag ".1")
                           :else (str prerelease-prefix "." (safe-inc (Integer/parseInt prerelease-number))))]
-    (str main-version "-" next-prerelease)))
+    (str main-version "-" (if version-changed prerelease-tag next-prerelease))))
 
 (defn norelease-reason [context related-data]
   (cond
@@ -129,7 +129,9 @@
         current-version     (get-tagged-version (:latest-release related-data))
         next-version        (semver-bump current-version bump-version-scheme)
         final-version       (if (is-prerelease? context related-data)
-                              (prerelease-bump next-version (:input/prerelease-tag context))
+                              (prerelease-bump next-version
+                                (:input/prerelease-tag context)
+                                (not= current-version next-version))
                               next-version)
         base-commit         (get-in related-data [:latest-release-commit :sha])
         tag-name            (str (:input/tag-prefix context) final-version)
