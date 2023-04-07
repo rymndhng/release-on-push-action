@@ -41,6 +41,7 @@
    :input/tag-prefix    (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
    :input/release-name  (System/getenv "INPUT_RELEASE_NAME") ;defaults to "<RELEASE_TAG>", see default in action.yml
    :input/use-github-release-notes (Boolean/parseBoolean (System/getenv "INPUT_USE_GITHUB_RELEASE_NOTES"))
+   :input/prerelease-tag (System/getenv "INPUT_PRERELEASE_TAG")
    :bump-version-scheme (assert-valid-bump-version-scheme
                          (try
                            (getenv-or-throw "INPUT_BUMP_VERSION_SCHEME")
@@ -53,16 +54,23 @@
                             (contains? (set args) "--dry-run"))})
 
 ;; -- Version Bumping Logic  ---------------------------------------------------
+(defn get-labels [related-prs]
+  (->> related-prs (map :labels) flatten (map :name) set))
+
+(defn is-prerelease? [context related-data]
+  (let [labels (get-labels (:related-prs related-data))]
+    (contains? labels "prerelease")))
+
 (defn fetch-related-data [context]
-  (let [latest-release (:body (github/fetch-latest-release context))]
-    {:related-prs           (:body (github/fetch-related-prs context))
+  (let [related-prs (:body (github/fetch-related-prs context))
+        latest-release (if (is-prerelease? context {:related-prs related-prs})
+                         (first (:body (github/fetch-releases context)))
+                         (:body (github/fetch-latest-release context)))]
+    {:related-prs           related-prs
      :commit                (:body (github/fetch-commit context))
      :latest-release        latest-release
      :latest-release-commit (when-let [tag (:tag_name latest-release)]
                               (:body (github/fetch-commit (assoc context :sha tag))))}))
-
-(defn get-labels [related-prs]
-  (->> related-prs (map :labels) flatten (map :name) set))
 
 (defn bump-version-scheme [context related-data]
   (let [labels (get-labels (:related-prs related-data))]
@@ -70,6 +78,7 @@
       (contains? labels "release:major") :major
       (contains? labels "release:minor") :minor
       (contains? labels "release:patch") :patch
+      (contains? labels "prerelease") :prerelease
       :else (keyword (:bump-version-scheme context)))))
 
 (defn get-tagged-version [latest-release]
@@ -81,15 +90,31 @@
   (inc (or n 0)))
 
 (defn semver-bump [version bump]
-  (let [[major minor patch] (map #(Integer/parseInt %) (str/split version #"\."))
+  (let [[main-version prerelease-version] (str/split version #"-")
+        [major minor patch] (map #(Integer/parseInt %) (str/split main-version #"\."))
         next-version (condp = bump
                        :major [(safe-inc major) 0 0]
                        :minor [major (safe-inc minor) 0]
-                       :patch [major minor (safe-inc patch)])]
-    (str/join "." next-version)))
+                       :patch [major minor (safe-inc patch)]
+                       :norelease [major minor patch]
+                       :prerelease [major minor patch])]
+    (str (str/join "." next-version) (if prerelease-version (str "-" prerelease-version)))))
+
+(defn prerelease-bump [version prerelease-tag version-changed]
+  (let [[main-version prerelease-version] (str/split version #"-")
+        [prerelease-prefix prerelease-number] (if (nil? prerelease-version)
+                                                [nil nil]
+                                                (str/split prerelease-version #"\."))
+        next-prerelease (cond
+                          (nil? prerelease-prefix) prerelease-tag
+                          (nil? prerelease-number) (str prerelease-tag ".1")
+                          :else (str prerelease-prefix "." (safe-inc (Integer/parseInt prerelease-number))))]
+    (str main-version "-" (if version-changed prerelease-tag next-prerelease))))
 
 (defn norelease-reason [context related-data]
   (cond
+    (is-prerelease? context related-data) nil
+
     (= :norelease (bump-version-scheme context related-data))
     "Skipping release, no version bump found."
 
@@ -103,8 +128,13 @@
   (let [bump-version-scheme (bump-version-scheme context related-data)
         current-version     (get-tagged-version (:latest-release related-data))
         next-version        (semver-bump current-version bump-version-scheme)
+        final-version       (if (is-prerelease? context related-data)
+                              (prerelease-bump next-version
+                                (:input/prerelease-tag context)
+                                (not= current-version next-version))
+                              next-version)
         base-commit         (get-in related-data [:latest-release-commit :sha])
-        tag-name            (str (:input/tag-prefix context) next-version)
+        tag-name            (str (:input/tag-prefix context) final-version)
 
         ;; this is a lazy sequence
         commits-since-last-release (->> (github/list-commits-to-base context base-commit)
@@ -112,7 +142,7 @@
                                         (map github/commit-summary))
 
         body (with-out-str
-               (printf "Version %s\n\n" next-version)
+               (printf "Version %s\n\n" final-version)
                (when-let [body (not-empty (:input/release-body context))]
                  (println body)
                  (println))
@@ -125,11 +155,11 @@
     {:tag_name               tag-name
      :target_commitish       (:sha context)
      :name                   (-> (:input/release-name context)
-                                 (str/replace "<RELEASE_VERSION>" next-version)
+                                 (str/replace "<RELEASE_VERSION>" final-version)
                                  (str/replace "<RELEASE_TAG>" tag-name))
      :body                   body
      :draft                  false
-     :prerelease             false
+     :prerelease             (is-prerelease? context related-data)
      :generate_release_notes (:input/use-github-release-notes context)}))
 
 (defn create-new-release! [context new-release-data]

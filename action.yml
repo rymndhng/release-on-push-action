@@ -4,7 +4,7 @@ description: 'Creates a Tag/Release on Push. Generates Release Notes. Customizab
 author: 'rymndhng'
 inputs:
   bump_version_scheme:
-    description: 'The bumping scheme to use by default. One of minor|major|patch|norelease'
+    description: 'The bumping scheme to use by default. One of minor|major|patch|prerelease|norelease'
     required: true
   release_body:
     description: "Additional text to insert into the release's body."
@@ -33,6 +33,10 @@ inputs:
     description: "When set to 'true', will compute the next tag, but will not create a release."
     required: false
     default: "false"
+  prerelease_tag:
+    description: "The tag to use for prerelease versions. For example a tag of 'pre': 1.0.0-pre.1."
+    required: false
+    default: "pre"
 outputs:
   tag_name:
     description: 'Tag of released version'

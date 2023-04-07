@@ -20,27 +20,91 @@
     "foo<<EOF\nhello\nworld\nEOF"  "hello\nworld"
     "foo<<EOF\nhello\rworld\nEOF"  "hello\rworld"))
 
+(deftest prerelease-bump
+  (testing "prerelease norelease bump"
+    (are [expected input] (= expected (sut/prerelease-bump input "pre" false))
+        "0.0.0-pre" "0.0.0"
+        "0.0.0-pre.1" "0.0.0-pre"
+        "0.0.1-pre" "0.0.1"
+        "0.0.1-pre.1" "0.0.1-pre"
+        "0.1.0-pre" "0.1.0"
+        "0.1.0-pre.1" "0.1.0-pre"
+        "1.1.0-pre" "1.1.0"
+        "1.1.0-pre.1" "1.1.0-pre"
+        "1.1.0-pre.2" "1.1.0-pre.1"))
+
+  (testing "prerelease release bump"
+    (are [expected input] (= expected (sut/prerelease-bump input "pre" true))
+            "0.0.1-pre" "0.0.1"
+            "0.0.1-pre" "0.0.1-pre"
+            "0.0.1-pre" "0.0.1-pre.1"
+            "0.1.0-pre" "0.1.0"
+            "0.1.0-pre" "0.1.0-pre"
+            "0.1.0-pre" "0.1.0-pre.1"
+            "1.1.0-pre" "1.1.0"
+            "1.1.0-pre" "1.1.0-pre"
+            "1.1.0-pre" "1.1.0-pre.1")))
+
 (deftest semver-bump
+  (testing "norelease bump"
+    (are [expected input] (= expected (sut/semver-bump input :norelease))
+        "0.0.0" "0.0.0"
+        "0.0.0-pre" "0.0.0-pre"
+        "0.0.0-pre.1" "0.0.0-pre.1"
+        "0.0.1" "0.0.1"
+        "0.0.1-pre" "0.0.1-pre"
+        "0.0.1-pre.1" "0.0.1-pre.1"
+        "0.1.0" "0.1.0"
+        "0.1.0-pre" "0.1.0-pre"
+        "0.1.0-pre.1" "0.1.0-pre.1"
+        "1.1.0" "1.1.0"
+        "1.1.0-pre" "1.1.0-pre"
+        "1.1.0-pre.1" "1.1.0-pre.1"))
+
   (testing "patch bump"
     (are [expected input] (= expected (sut/semver-bump input :patch))
         "0.0.1" "0.0.0"
+        "0.0.1-pre" "0.0.0-pre"
+        "0.0.1-pre.1" "0.0.0-pre.1"
         "0.0.2" "0.0.1"
+        "0.0.2-pre" "0.0.1-pre"
+        "0.0.2-pre.1" "0.0.1-pre.1"
         "0.1.1" "0.1.0"
-        "1.1.1" "1.1.0"))
+        "0.1.1-pre" "0.1.0-pre"
+        "0.1.1-pre.1" "0.1.0-pre.1"
+        "1.1.1" "1.1.0"
+        "1.1.1-pre" "1.1.0-pre"
+        "1.1.1-pre.1" "1.1.0-pre.1"))
 
   (testing "minor bump"
     (are [expected input] (= expected (sut/semver-bump input :minor))
         "0.1.0" "0.0.0"
+        "0.1.0-pre" "0.0.0-pre"
+        "0.1.0-pre.1" "0.0.0-pre.1"
         "0.1.0" "0.0.1"
+        "0.1.0-pre" "0.0.1-pre"
+        "0.1.0-pre.1" "0.0.1-pre.1"
         "0.2.0" "0.1.0"
-        "1.2.0" "1.1.0"))
+        "0.2.0-pre" "0.1.0-pre"
+        "0.2.0-pre.1" "0.1.0-pre.1"
+        "1.2.0" "1.1.0"
+        "1.2.0-pre" "1.1.0-pre"
+        "1.2.0-pre.1" "1.1.0-pre.1"))
 
   (testing "major bump"
     (are [expected input] (= expected (sut/semver-bump input :major))
       "1.0.0" "0.0.0"
+      "1.0.0-pre" "0.0.0-pre"
+      "1.0.0-pre.1" "0.0.0-pre.1"
       "1.0.0" "0.0.1"
+      "1.0.0-pre" "0.0.1-pre"
+      "1.0.0-pre.1" "0.0.1-pre.1"
       "1.0.0" "0.1.0"
-      "2.0.0" "1.1.0")))
+      "1.0.0-pre" "0.1.0-pre"
+      "1.0.0-pre.1" "0.1.0-pre.1"
+      "2.0.0" "1.1.0"
+      "2.0.0-pre" "1.1.0-pre"
+      "2.0.0-pre.1" "1.1.0-pre.1")))
 
 (def base-ctx
   {:token               (System/getenv "GITHUB_TOKEN") ;use Github Actions Token as test token
