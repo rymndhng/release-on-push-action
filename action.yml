@@ -40,6 +40,8 @@ outputs:
     description: 'Version of release'
   body:
     description: 'Github Release Body in Text'
+  upload_url:
+    description: 'Github Release Upload URL'
 runs:
   using: 'docker'
   image: 'Dockerfile'
