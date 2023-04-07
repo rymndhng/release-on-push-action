@@ -93,7 +93,7 @@ track what the last release version is. See [Release#get-the-latest-release](htt
 
 ### How can I get the generated tag or version?
 
-On a successful release, this action creates an output parameters `tag_name` and `version`. 
+On a successful release, this action creates an output parameters `tag_name`, `upload_url` and `version`. 
 
 Example of how to consume this:
 
@@ -119,6 +119,7 @@ jobs:
         run: |
           echo "Got tag name ${{ steps.release.outputs.tag_name }}"
           echo "Got release version ${{ steps.release.outputs.version }}"
+          echo "Upload release artifacts to ${{ steps.release.outputs.upload_url }}"
 ```
 
 ### Can I customize the release body message?
