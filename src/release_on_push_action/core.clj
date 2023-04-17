@@ -1,9 +1,7 @@
 (ns release-on-push-action.core
-    (:require
-      [babashka.curl :as curl]
+    (:require [babashka.curl :as curl]
       [cheshire.core :as json]
       [clojure.string :as str]
-      [clojure.core :as core]
       [clojure.java.io :as io]
       [release-on-push-action.github :as github]))
 
