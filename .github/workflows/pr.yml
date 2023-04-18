@@ -40,10 +40,10 @@ jobs:
           echo "Got body ${{ steps.integration-tests.outputs.body }}"
 
       - name: Container Builds
-        run: docker build . -t rymndhng/release-on-push-action
+        run: docker build . -t jc-public/github-release-action
 
       - name: Container Test
-        run: docker run -e INPUT_BUMP_VERSION_SCHEME -e INPUT_MAX_COMMITS -e INPUT_TAG_PREFIX -e INPUT_RELEASE_NAME -e GITHUB_API_URL -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_TOKEN rymndhng/release-on-push-action --dry-run
+        run: docker run -e INPUT_BUMP_VERSION_SCHEME -e INPUT_MAX_COMMITS -e INPUT_TAG_PREFIX -e INPUT_RELEASE_NAME -e GITHUB_API_URL -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_TOKEN jc-public/github-release-action --dry-run
         env:
           INPUT_BUMP_VERSION_SCHEME: minor
           INPUT_MAX_COMMITS: 5
