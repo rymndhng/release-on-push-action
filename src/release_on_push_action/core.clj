@@ -31,15 +31,19 @@
   See https://docs.github.com/en/actions/reference/environment-variables.
   "
   [args]
-  {:token               (getenv-or-throw "GITHUB_TOKEN")
-   :repo                (getenv-or-throw "GITHUB_REPOSITORY")
-   :sha                 (getenv-or-throw "GITHUB_SHA")
-   :github/api-url      (getenv-or-throw "GITHUB_API_URL")
-   :github/output       (System/getenv "GITHUB_OUTPUT")
-   :input/max-commits   (Integer/parseInt (getenv-or-throw "INPUT_MAX_COMMITS"))
-   :input/release-body  (System/getenv "INPUT_RELEASE_BODY")
-   :input/tag-prefix    (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
-   :input/release-name  (System/getenv "INPUT_RELEASE_NAME") ;defaults to "<RELEASE_TAG>", see default in action.yml
+  {:token                 (getenv-or-throw "GITHUB_TOKEN")
+   :repo                  (getenv-or-throw "GITHUB_REPOSITORY")
+   :sha                   (getenv-or-throw "GITHUB_SHA")
+   :github/api-url        (getenv-or-throw "GITHUB_API_URL")
+   :github/output         (System/getenv "GITHUB_OUTPUT")
+   :input/max-commits     (Integer/parseInt (getenv-or-throw "INPUT_MAX_COMMITS"))
+   :input/release-body    (System/getenv "INPUT_RELEASE_BODY")
+   :input/tag-prefix      (System/getenv "INPUT_TAG_PREFIX") ;defaults to "v", see default in action.yml
+   :input/release-name    (System/getenv "INPUT_RELEASE_NAME") ;defaults to "<RELEASE_TAG>", see default in action.yml
+   :input/pr-label-major  (System/getenv "INPUT_PR_LABEL_MAJOR") ;defaults to "release:major", see default in action.yml
+   :input/pr-label-minor  (System/getenv "INPUT_PR_LABEL_MINOR") ;defaults to "release:minor", see default in action.yml
+   :input/pr-label-patch  (System/getenv "INPUT_PR_LABEL_PATCH") ;defaults to "release:patch", see default in action.yml
+   :input/pr-label-norelease (System/getenv "INPUT_PR_LABEL_NORELEASE") ;defaults to "norelease", see default in action.yml
    :input/use-github-release-notes (Boolean/parseBoolean (System/getenv "INPUT_USE_GITHUB_RELEASE_NOTES"))
    :bump-version-scheme (assert-valid-bump-version-scheme
                          (try
@@ -67,9 +71,9 @@
 (defn bump-version-scheme [context related-data]
   (let [labels (get-labels (:related-prs related-data))]
     (cond
-      (contains? labels "release:major") :major
-      (contains? labels "release:minor") :minor
-      (contains? labels "release:patch") :patch
+      (contains? labels :input/pr-label-major) :major
+      (contains? labels :input/pr-label-minor) :minor
+      (contains? labels :input/pr-label-patch) :patch
       :else (keyword (:bump-version-scheme context)))))
 
 (defn get-tagged-version [latest-release]
@@ -96,8 +100,8 @@
     (str/includes? (github/commit-title (:commit related-data)) "[norelease]")
     "Skipping release. Reason: git commit title contains [norelease]"
 
-    (contains? (get-labels (get-in related-data [:related-prs])) "norelease")
-    "Skipping release. Reason: related PR has label norelease"))
+    (contains? (get-labels (get-in related-data [:related-prs])) :input/pr-label-norelease)
+    (format "Skipping release. Reason: related PR has label %s" :input/pr-label-norelease)))
 
 (defn generate-new-release-data [context related-data]
   (let [bump-version-scheme (bump-version-scheme context related-data)

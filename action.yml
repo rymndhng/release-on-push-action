@@ -21,6 +21,22 @@ inputs:
         <RELEASE_TAG>     the git tag name, e.g. "v1.2.3"
     required: true
     default: '<RELEASE_TAG>'
+  pr_label_major:
+    description: "PR label name to use for bumping the major version."
+    required: false
+    default: 'release:major'
+  pr_label_minor:
+    description: "PR label name to use for bumping the minor version."
+    required: false
+    default: 'release:minor'
+  pr_label_patch:
+    description: "PR label name to use for bumping the patch version."
+    required: false
+    default: 'release:patch'
+  pr_label_norelease:
+    description: "PR label name to use for skipping the release."
+    required: false
+    default: 'release:norelease'
   max_commits:
     description: "Maximum number of commits to add to release body"
     required: false
