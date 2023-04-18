@@ -12,3 +12,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           bump_version_scheme: norelease
+          pr_label_major: major
+          pr_label_minor: minor
+          pr_label_patch: patch
+          pr_label_norelease: no version
