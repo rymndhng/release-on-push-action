@@ -148,7 +148,7 @@ jobs:
 
 ### Can I use Github's Generated Release Notes?
 
-Yes you can, by setting `use-github-release-notes` to `true`. For more information, see [Automatic Release Notes](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes).
+Yes you can, by setting `use_github_release_notes` to `true`. For more information, see [Automatic Release Notes](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes).
 
 Note, if enabling this feature:
 - If you have set `release_body`, the `release_body` will be prepended to the Generated Release Notes
