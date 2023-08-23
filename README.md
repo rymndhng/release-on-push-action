@@ -1,21 +1,3 @@
-# Notice: Specialized Fork
-
-🔧 This repository, `DasBen/release-on-push-action`, is a fork of `rymndhng/release-on-push-action`. It has been created specifically to address and fix certain issues in the upstream repository.
-
-## Purpose of This Fork
-
-This fork is meant for temporary usage and has been designed to provide specific bug fixes or enhancements that are currently pending in the upstream repository. 
-
-It is highly recommended to follow the progress of the upstream repository, [`rymndhng/release-on-push-action`](https://github.com/rymndhng/release-on-push-action), for official updates and support.
-
-## How to Use
-
-1. Include this forked action in your GitHub Actions workflow file as you would with the original action.
-2. Monitor the [original repository](https://github.com/rymndhng/release-on-push-action) for updates and changes related to the issue this fork addresses.
-3. Transition back to the original action when the necessary fixes have been implemented upstream.
-
-Thank you for understanding the specific nature of this repository!
-
 # Github Release On Push Action
 
 > Stop using files for versioning. Use git tags instead!
