@@ -190,5 +190,6 @@
           (println (:body release-data)))
         (do
           (println "Executing Release\n" (json/generate-string release-data {:pretty true}))
-          (println (create-new-release! context release-data))))
-      (set-output-parameters! context release-data))))
+          (let [api-response (create-new-release! context release-data)]
+            (println api-response)
+            (set-output-parameters! context release-data api-response)))))))
