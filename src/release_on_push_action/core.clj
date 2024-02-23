@@ -33,7 +33,10 @@
   [args]
   {:token               (getenv-or-throw "GITHUB_TOKEN")
    :repo                (getenv-or-throw "GITHUB_REPOSITORY")
-   :sha                 (or (System/getenv "INPUT_SHA") (getenv-or-throw "GITHUB_SHA"))
+   :sha                 (let [input-sha (System/getenv "INPUT_SHA")]
+                          (if (or (empty? input-sha) (nil? input-sha))
+                            (getenv-or-throw "GITHUB_SHA")
+                            input-sha))
    :github/api-url      (getenv-or-throw "GITHUB_API_URL")
    :github/output       (System/getenv "GITHUB_OUTPUT")
    :input/max-commits   (Integer/parseInt (getenv-or-throw "INPUT_MAX_COMMITS"))
