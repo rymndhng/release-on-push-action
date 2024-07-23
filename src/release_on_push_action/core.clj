@@ -13,6 +13,10 @@
                       {:env/name name})))
     val))
 
+(defn getenv-or-default [name default]
+  (let [val (System/getenv name)]
+    (if (nil? val) default val)))
+
 (defn input-strategy-set? []
   (if (System/getenv "INPUT_STRATEGY")
     (do
@@ -50,7 +54,8 @@
                                (getenv-or-throw "INPUT_STRATEGY")
                                (throw ex)))))
    :dry-run             (or (Boolean/parseBoolean (System/getenv "INPUT_DRY_RUN"))
-                            (contains? (set args) "--dry-run"))})
+                            (contains? (set args) "--dry-run"))
+   :draft               (Boolean/parseBoolean (getenv-or-default "INPUT_DRAFT" "false"))})
 
 ;; -- Version Bumping Logic  ---------------------------------------------------
 (defn fetch-related-data [context]
@@ -128,7 +133,7 @@
                                  (str/replace "<RELEASE_VERSION>" next-version)
                                  (str/replace "<RELEASE_TAG>" tag-name))
      :body                   body
-     :draft                  false
+     :draft                  (:draft context)
      :prerelease             false
      :generate_release_notes (:input/use-github-release-notes context)}))
 
