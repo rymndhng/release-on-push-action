@@ -245,6 +245,36 @@ jobs:
           max_commits: 100
 ```
 
+### How can I select a commit SHA different from `GITHUB_SHA`?
+
+By default, the release is created on the commit that triggered the workflow, as identified by the `GITHUB_SHA` environment variable. Sometimes, that's not the desired behaviour; for example, the `workflow_run` event sets `GITHUB_SHA` to the last commit on the default branch, but we might want to tag the commit that was the most recent one when the workflow started.
+
+A different SHA can be selected using the `sha` option. If it is unset, `GITHUB_SHA` is used.
+
+Example usage for a release triggered by a (potentially long running) workflow run:
+
+```yaml
+on:
+  workflow_run:
+    workflows:
+      - Slow CI test workflow
+    types:
+      - completed
+    branches:
+      - master
+
+jobs:
+  release-on-push:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: rymndhng/release-on-push-action@master
+        with:
+          sha: ${{ github.event.workflow_run.head_sha }}
+```
+
 ## Development
 
 Uses [babashka](https://github.com/borkdude/babashka)

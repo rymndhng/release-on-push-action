@@ -33,6 +33,9 @@ inputs:
     description: "When set to 'true', will compute the next tag, but will not create a release."
     required: false
     default: "false"
+  sha:
+    description: 'The commit SHA to create the release on if different from GITHUB_SHA'
+    required: false
 outputs:
   tag_name:
     description: 'Tag of released version'
