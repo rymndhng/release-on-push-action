@@ -103,9 +103,9 @@
     (case use-prerelease
       "true"  true
       "false" false
-      "auto"  (not (empty? (:input/tag-suffix context)))
+      "auto"  (seq (:input/tag-suffix context))
       ;; default: treat invalid values as auto
-      (not (empty? (:input/tag-suffix context))))))
+      (seq (:input/tag-suffix context)))))
 
 (defn norelease-reason [context related-data]
   (cond
