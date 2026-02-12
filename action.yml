@@ -4,7 +4,7 @@ description: 'Creates a Tag/Release on Push. Generates Release Notes. Customizab
 author: 'rymndhng'
 inputs:
   bump_version_scheme:
-    description: 'The bumping scheme to use by default. One of minor|major|patch|norelease'
+    description: 'The bumping scheme to use by default. One of minor|major|patch|keep|norelease'
     required: true
   release_body:
     description: "Additional text to insert into the release's body."
@@ -13,6 +13,14 @@ inputs:
     description: "Prefix to append to git tags. To unset this, set version_prefix to an empty string."
     required: false
     default: 'v'
+  tag_suffix:
+    description: "Suffix to append to git tags, e.g. '-alpha', '-rc1', or 'alpha', 'rc1' (without dash). Leave empty for no suffix."
+    required: false
+    default: ''
+  use_prerelease:
+    description: "Controls whether releases are marked as pre-releases. Set to 'auto' to auto-detect based on tag_suffix, 'true' to always mark as pre-release, 'false' to never mark as pre-release."
+    required: false
+    default: 'auto'
   release_name:
     description: |
       Name of the release. Supports these template variables:
